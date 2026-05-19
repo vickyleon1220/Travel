@@ -1086,6 +1086,8 @@
         setItinerary(newItinerary);
         syncToFirestore({ itinerary: newItinerary });
         setIsAddingEvent(false);
+      };
+
       const moveEventToDay = (currentDayId, eventId, targetDayId) => {
         const targetDayIdInt = parseInt(targetDayId, 10);
         if (currentDayId === targetDayIdInt) return;
