@@ -939,7 +939,15 @@
         const unsubscribe = TRAVEL_DOC_REF.onSnapshot((doc) => {
           if (doc.exists) {
             const data = doc.data();
-            if (data.itinerary) setItinerary(data.itinerary);
+            if (data.itinerary) {
+              if (data.itinerary.length < 29) {
+                // 自動將舊的 28 天行程覆蓋為新的 29 天行程
+                setItinerary(defaultItinerary);
+                TRAVEL_DOC_REF.update({ itinerary: defaultItinerary });
+              } else {
+                setItinerary(data.itinerary);
+              }
+            }
             if (data.packingList) setPackingList(data.packingList);
             if (data.todos) setTodos(data.todos);
           } else {
