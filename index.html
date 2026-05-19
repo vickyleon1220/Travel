@@ -127,12 +127,11 @@
         depAirport: 'San Francisco SFO (T-I)',
         arrAirport: 'Taipei Taoyuan TPE (T-2)',
         seats: {
-          James: '4B',
-          Vicky: '5B',
-          Chenn: '5A',
-          Honn: '4A'
-        }
-      },
+          James: '34H',
+          Vicky: '33H',
+          Chenn: '33K',
+          Honn: '34K'
+        },
       {
         id: 'f2',
         segment: '2',
@@ -729,7 +728,6 @@
           itinerary: '每日行程表',
           flights: '飛機航班',
           hotels: '酒店住宿',
-          hsr: '高鐵票預定',
           packing: '行李清單',
           todo: '待辦事項'
         },
@@ -775,7 +773,6 @@
           itinerary: 'Daily Itinerary',
           flights: 'Flights',
           hotels: 'Hotels',
-          hsr: 'HSR Booking',
           packing: 'Packing List',
           todo: 'To-Do List'
         },
@@ -1341,16 +1338,7 @@
               >
                 🏨 {t.tabs.hotels}
               </button>
-              <button 
-                onClick={() => setActiveTab('hsr')}
-                className={`flex-1 min-w-[120px] text-center py-3 text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 ${
-                  activeTab === 'hsr' 
-                    ? 'bg-pink-100 text-pink-700 shadow-sm' 
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
-              >
-                🚄 {t.tabs.hsr}
-              </button>
+              
               <button 
                 onClick={() => setActiveTab('packing')}
                 className={`flex-1 min-w-[120px] text-center py-3 text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 ${
