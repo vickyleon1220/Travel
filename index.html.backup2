@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 日本札幌-台灣家庭旅遊行程規劃表</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React 18, ReactDOM & Babel CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js" crossorigin></script>
+
+  <!-- Firebase SDK (compat 版本，支援全域 firebase 物件) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Firebase 配置初始化
+    const firebaseConfig = {
+      apiKey: "AIzaSyDqcAh9eIl37hYSsHKv97pGhtcQS7RXwv4",
+      authDomain: "travel-f56a9.firebaseapp.com",
+      projectId: "travel-f56a9",
+      storageBucket: "travel-f56a9.firebasestorage.app",
+      messagingSenderId: "429667440747",
+      appId: "1:429667440747:web:4f1ff31e2b3ec242fff92e",
+      measurementId: "G-9F41WZW7GH"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    // 全域 Firebase 服務實例
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+    // 授權白名單
+    const ALLOWED_EMAILS = [
+      "maxidea.tw@gmail.com",
+      "vickychang1220@gmail.com",
+      "chennlee2012@gmail.com",
+      "honnchilee@gmail.com"
+    ];
+  </script>
+
+  <style>
+    /* 隱藏橫向滾動條，保持介面乾淨 */
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* 登入頁面背景動畫 */
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .login-bg {
+      background: linear-gradient(-45deg, #fce4ec, #e8f5e9, #e3f2fd, #fff3e0);
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+    }
+    /* Loading 旋轉動畫 */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #ec4899;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    /* 登入按鈕 hover 效果 */
+    .google-btn {
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .google-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    /* 用戶頭像 */
+    .user-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // ==========================================
+    // 預設資料設定 (FLIGHTS, HOTELS, HSR, PACKING, TODOS, ITINERARY)
+    // ==========================================
+
+    const defaultFlights = [
+      {
+        id: 'f1',
+        segment: '1',
+        route: 'SFO ➔ TPE',
+        airline: 'China Airlines 華航',
+        flightNo: 'CI 003',
+        depTime: '2026-06-17 01:05',
+        arrTime: '2026-06-18 05:35',
+        depAirport: 'San Francisco SFO (T-I)',
+        arrAirport: 'Taipei Taoyuan TPE (T-2)',
+        seats: {
+          James: '34H',
+          Vicky: '33H',
+          Chenn: '33K',
+          Honn: '34K'
+        },
+      {
+        id: 'f2',
+        segment: '2',
+        route: 'TPE ➔ CTS',
+        airline: 'China Airlines 華航',
+        flightNo: 'CI 130',
+        depTime: '2026-06-18 08:35',
+        arrTime: '2026-06-18 13:35',
+        depAirport: 'Taipei Taoyuan TPE (T-2)',
+        arrAirport: 'Sapporo New Chitose CTS (T-I)',
+        seats: {
+          James: '4B',
+          Vicky: '5B',
+          Chenn: '5A',
+          Honn: '4A'
+        }
+      },
+      {
+        id: 'f3',
+        segment: '3',
+        route: 'CTS ➔ TPE',
+        airline: 'China Airlines 華航',
+        flightNo: 'CI 131',
+        depTime: '2026-06-29 15:00',
+        arrTime: '2026-06-29 18:10',
+        depAirport: 'Sapporo New Chitose CTS (T-I)',
+        arrAirport: 'Taipei Taoyuan TPE (T-2)',
+        seats: {
+          James: '3J',
+          Vicky: '2J',
+          Chenn: '2K',
+          Honn: '3K'
+        }
+      },
+      {
+        id: 'f4',
+        segment: '4',
+        route: 'TPE ➔ SFO',
+        airline: 'China Airlines 華航',
+        flightNo: 'CI 004',
+        depTime: '2026-07-15 23:40',
+        arrTime: '2026-07-15 19:40',
+        depAirport: 'Taipei Taoyuan TPE (T-2)',
+        arrAirport: 'San Francisco SFO (T-I)',
+        seats: {
+          James: '34H',
+          Vicky: '33H',
+          Chenn: '33K',
+          Honn: '34K'
+        }
+      }
+    ];
+
+    const defaultHotels = [
+      {
+        id: 'h1',
+        name: '京急EX酒店札幌 (Keikyu EX Hotel Sapporo)',
+        period: '2026/06/18 - 2026/06/21 (3 晚) & 2026/06/23 - 2026/06/29 (6 晚)',
+        roomType: '四人房 4-Bedded Room (Non-smoking)',
+        notes: '含早餐 Included Breakfast. 鄰近札幌車站 JR Sapporo Station.',
+        address: '北海道札幌市北区北六条西4丁目2番6号'
+      },
+      {
+        id: 'h2',
+        name: '定山溪Grand Blissen酒店 (Grand Blissen Hotel Jozankei)',
+        period: '2026/06/21 - 2026/06/23 (2 晚)',
+        roomType: '日西合璧客房附溫泉全景浴池 Japanese-Western Room with Open-air Bath',
+        notes: '一泊二食 Half Board (Breakfast & Dinner). 免費接送巴士預約完成 (Shuttle bus reservation confirmed). 6/21 13:00 札幌站北口出發; 6/23 10:45 飯店出發。',
+        address: '北海道札幌市南区定山渓温泉東4-328'
+      },
+      {
+        id: 'h3',
+        name: '台南富信大飯店 (Fushin Hotel Tainan)',
+        period: '2026/06/29 - 2026/07/06 (7 晚)',
+        roomType: '標準家庭房 Standard Family Room',
+        notes: '含中西自助式早餐 Included Breakfast. 飯店不提供一次性盥洗用品。',
+        address: '70443台南市北區成功路336號'
+      },
+      {
+        id: 'h4',
+        name: '台北茹曦酒店 (Illume Taipei)',
+        period: '2026/07/06 - 2026/07/15 (9 晚)',
+        roomType: '豪華雙床房 Standard Room with Twin Beds (2 間房)',
+        notes: '不含早餐 Without Breakfast. 響應環保不提供一次性盥洗用品。 James 預約 (Room 1) + Vicky 預約 (Room 2).',
+        address: '105020台北市松山區敦化北路100號'
+      }
+    ];
+
+    const defaultHsr = [
+      {
+        id: 'hsr1',
+        date: '2026-06-29',
+        trainNo: '853',
+        route: '桃園 (Taoyuan) ➔ 台南 (Tainan)',
+        depTime: '20:10',
+        arrTime: '21:32',
+        seats: '4位成人 (Car 4, Seats 5A, 5B, 5C, 5D)',
+        notes: '出站後可搭計程車或接駁抵達台南富信大飯店。'
+      },
+      {
+        id: 'hsr2',
+        date: '2026-07-06',
+        trainNo: '638',
+        route: '台南 (Tainan) ➔ 台北 (Taipei)',
+        depTime: '11:48',
+        arrTime: '13:32',
+        seats: '4位成人 (Car 3, Seats 8A, 8B, 8C, 8D)',
+        notes: '抵達台北後，轉乘捷運或計程車至茹曦酒店辦理入住。'
+      }
+    ];
+
+    const defaultPackingList = {
+      James: [
+        { id: 'j1', text: '襪子 Socks', checked: false },
+        { id: 'j2', text: '衣服 Clothes', checked: false },
+        { id: 'j3', text: 'UV 外套 UV Jacket', checked: false },
+        { id: 'j4', text: 'UV 帽子 UV Hat', checked: false },
+        { id: 'j5', text: '內褲 Underwear', checked: false },
+        { id: 'j6', text: '褲子 Pants', checked: false },
+        { id: 'j7', text: '睡衣 Pyjamas', checked: false },
+        { id: 'j8', text: '刮鬍刀 Razor', checked: false },
+        { id: 'j9', text: '睡褲 Sleep Pants', checked: false },
+        { id: 'j10', text: '牙刷 Toothbrush', checked: false },
+        { id: 'j11', text: '牙膏 Toothpaste', checked: false },
+        { id: 'j12', text: '水壺 Water Bottle', checked: false },
+        { id: 'j13', text: '手機 Phone', checked: false },
+        { id: 'j14', text: '錢包 Wallet', checked: false },
+        { id: 'j15', text: '泳褲 Swim Trunks', checked: false },
+        { id: 'j16', text: '蛙鏡 Goggles', checked: false },
+        { id: 'j17', text: '太陽眼鏡 Sunglasses', checked: false },
+        { id: 'j18', text: '拖鞋 Slippers', checked: false },
+        { id: 'j19', text: '玩水鞋 Water Shoes', checked: false },
+        { id: 'j20', text: '護照 Passport', checked: false },
+        { id: 'j21', text: '悠遊卡 EasyCard', checked: false },
+        { id: 'j22', text: '機票 Ticket', checked: false }
+      ],
+      Vicky: [
+        { id: 'v1', text: '襪子 Socks', checked: false },
+        { id: 'v2', text: '衣服 Clothes', checked: false },
+        { id: 'v3', text: 'UV 外套 UV Jacket', checked: false },
+        { id: 'v4', text: 'UV 帽子 UV Hat', checked: false },
+        { id: 'v5', text: '內褲 Underwear', checked: false },
+        { id: 'v6', text: '內衣 Bra', checked: false },
+        { id: 'v7', text: '睡衣 Pyjamas', checked: false },
+        { id: 'v8', text: '睡褲 Sleep Pants', checked: false },
+        { id: 'v9', text: '牙刷 Toothbrush', checked: false },
+        { id: 'v10', text: '牙膏 Toothpaste', checked: false },
+        { id: 'v11', text: '濕疹乳液 Eczema Lotion', checked: false },
+        { id: 'v12', text: '防曬乳液 Sunscreen', checked: false },
+        { id: 'v13', text: '漱口水 Mouthwash', checked: false },
+        { id: 'v14', text: '棉花棒 Cotton Swabs', checked: false },
+        { id: 'v15', text: '腋下香香 Deodorant', checked: false },
+        { id: 'v16', text: '隱形眼鏡 Contacts', checked: false },
+        { id: 'v17', text: '保濕乳液 Moisturizer', checked: false },
+        { id: 'v18', text: '漱口杯 Cup', checked: false },
+        { id: 'v19', text: '手機充電器 Charger', checked: false },
+        { id: 'v20', text: '手機 Phone', checked: false },
+        { id: 'v21', text: '鏡子 Mirror', checked: false },
+        { id: 'v22', text: '濕紙巾(手臉) Wipes', checked: false },
+        { id: 'v23', text: '塑膠袋 Plastic Bags', checked: false },
+        { id: 'v24', text: '泳衣 Swimsuit', checked: false },
+        { id: 'v25', text: '泳帽 Swim Cap', checked: false },
+        { id: 'v26', text: '太陽眼鏡 Sunglasses', checked: false },
+        { id: 'v27', text: '常用藥品 Medicine', checked: false },
+        { id: 'v28', text: '護唇膏 Lip Balm', checked: false },
+        { id: 'v29', text: '枕頭 Pillow', checked: false },
+        { id: 'v30', text: '護照 Passport', checked: false },
+        { id: 'v31', text: '悠遊卡 EasyCard', checked: false },
+        { id: 'v32', text: '機票 Ticket', checked: false }
+      ],
+      Chenn: [
+        { id: 'c1', text: '襪子 Socks', checked: false },
+        { id: 'c2', text: '衣服 Clothes', checked: false },
+        { id: 'c3', text: 'UV 外套 UV Jacket', checked: false },
+        { id: 'c4', text: 'UV 帽子 UV Hat', checked: false },
+        { id: 'c5', text: '內褲 Underwear', checked: false },
+        { id: 'c6', text: '褲子 Pants', checked: false },
+        { id: 'c7', text: '紗布手帕 Gauze', checked: false },
+        { id: 'c8', text: '睡衣 Pyjamas', checked: false },
+        { id: 'c9', text: '睡褲 Sleep Pants', checked: false },
+        { id: 'c10', text: '牙刷 Toothbrush', checked: false },
+        { id: 'c11', text: '牙膏 Toothpaste', checked: false },
+        { id: 'c12', text: '水壺 Water Bottle', checked: false },
+        { id: 'c13', text: '防曬乳液 Sunscreen', checked: false },
+        { id: 'c14', text: '漱口水 Mouthwash', checked: false },
+        { id: 'c15', text: '漱口杯 Cup', checked: false },
+        { id: 'c16', text: '手機 Phone', checked: false },
+        { id: 'c17', text: '枕頭 Pillow', checked: false },
+        { id: 'c18', text: '太陽眼鏡 Sunglasses', checked: false },
+        { id: 'c19', text: 'UV 長袖 UV Long Sleeve', checked: false },
+        { id: 'c20', text: '泳褲 Swim Trunks', checked: false },
+        { id: 'c21', text: '玩水鞋 Water Shoes', checked: false },
+        { id: 'c22', text: '牙線 Floss', checked: false },
+        { id: 'c23', text: '護照 Passport', checked: false },
+        { id: 'c24', text: '悠遊卡 EasyCard', checked: false },
+        { id: 'c25', text: '機票 Ticket', checked: false }
+      ],
+      Honn: [
+        { id: 'h1', text: '襪子 Socks', checked: false },
+        { id: 'h2', text: '衣服 Clothes', checked: false },
+        { id: 'h3', text: 'UV 外套 UV Jacket', checked: false },
+        { id: 'h4', text: 'UV 帽子 UV Hat', checked: false },
+        { id: 'h5', text: '褲子 Pants', checked: false },
+        { id: 'h6', text: '內褲 Underwear', checked: false },
+        { id: 'h7', text: '紗布手帕 Gauze', checked: false },
+        { id: 'h8', text: '睡衣 Pyjamas', checked: false },
+        { id: 'h9', text: '睡褲 Sleep Pants', checked: false },
+        { id: 'h10', text: '牙刷 Toothbrush', checked: false },
+        { id: 'h11', text: '牙膏 Toothpaste', checked: false },
+        { id: 'h12', text: '水壺 Water Bottle', checked: false },
+        { id: 'h13', text: '玩偶 Plush Toy', checked: false },
+        { id: 'h14', text: '濕紙巾(屁股) Wipes (Bottom)', checked: false },
+        { id: 'h15', text: '髮膠 Hair Gel', checked: false },
+        { id: 'h16', text: '枕頭 Pillow', checked: false },
+        { id: 'h17', text: '太陽眼鏡 Sunglasses', checked: false },
+        { id: 'h18', text: '手機 Phone', checked: false },
+        { id: 'h19', text: '泳褲 Swim Trunks', checked: false },
+        { id: 'h20', text: '蛙鏡 Goggles', checked: false },
+        { id: 'h21', text: '拖鞋 Slippers', checked: false },
+        { id: 'h22', text: '小零食 Snacks', checked: false },
+        { id: 'h23', text: '玩水鞋 Water Shoes', checked: false },
+        { id: 'h24', text: '護唇膏 Lip Balm', checked: false },
+        { id: 'h25', text: '護照 Passport', checked: false },
+        { id: 'h26', text: '悠遊卡 EasyCard', checked: false },
+        { id: 'h27', text: '機票 Ticket', checked: false }
+      ]
+    };
+
+    const defaultTodos = [
+      { id: 't1', text: '檢查全家護照效期 (Check family passport expiry dates)', checked: true },
+      { id: 't2', text: '確認日本 Visit Japan Web 登錄完成 (Complete Visit Japan Web registration)', checked: false },
+      { id: 't3', text: '預訂日本上網 SIM 卡 / eSIM (Book Japan internet SIM/eSIM)', checked: false },
+      { id: 't4', text: '確認高鐵車票已取票或下載 T-EX App (Pick up HSR tickets or download App)', checked: false },
+      { id: 't5', text: '準備日幣現金及海外刷卡信用卡 (Prepare Japanese Yen and credit cards)', checked: false },
+      { id: 't6', text: '影印保險、酒店訂房單、機票備份 (Print travel insurance, booking vouchers, and flight tickets)', checked: false }
+    ];
+
+    const defaultItinerary = [
+      // --- HOKKAIDO (Day 1 - 13) ---
+      {
+        day: 1,
+        date: '2026-06-17',
+        category: 'hokkaido',
+        events: [
+          { id: 'e0-1', time: '01:05', activity: '從舊金山機場出發 Depart from San Francisco Airport (SFO)', notes: '搭乘華航 CI 003，預計飛行約 12 小時抵達台北桃園機場。座位：James 4B, Vicky 5B, Chenn 5A, Honn 4A。' }
+        ]
+      },
+      {
+        day: 2,
+        date: '2026-06-18',
+        category: 'hokkaido',
+        events: [
+          { id: 'e1-1', time: '05:35', activity: '抵達桃園機場 Arrive at Taoyuan Airport (TPE)', notes: 'CI 003 降落，於航廈2轉機 CI 130 往札幌。' },
+          { id: 'e1-2', time: '08:35', activity: '搭乘華航 CI 130 飛往札幌 Flight to Sapporo', notes: '航程約 4 小時。預計 13:35 抵達新千歲機場 (CTS)。' },
+          { id: 'e1-3', time: '13:35', activity: '降落新千歲機場 Arrive at New Chitose Airport', notes: '辦理入境與行李提領。' },
+          { id: 'e1-4', time: '15:00', activity: '搭乘快速 Airport 號前往札幌市區 Rapid Train to Sapporo', notes: '約 37 分鐘抵達 JR 札幌站。' },
+          { id: 'e1-5', time: '16:00', activity: '辦理入住：京急EX酒店札幌 Check-in at Keikyu EX Hotel Sapporo', notes: '放行李，稍作休息。' },
+          { id: 'e1-6', time: '18:00', activity: '大通公園散步與晚餐 Walk around Odori Park & Dinner', notes: '晚餐推薦：札幌拉麵共和國 (Sapporo Ramen Republic) 享用道地拉麵。' }
+        ]
+      },
+      {
+        day: 3,
+        date: '2026-06-19',
+        category: 'hokkaido',
+        events: [
+          { id: 'e2-1', time: '09:00', activity: '北海道神宮參拜 Hokkaido Shrine Visit', notes: '漫步綠意盎然的圓山公園與祈福。' },
+          { id: 'e2-2', time: '12:00', activity: '午餐：札幌螃蟹本家 (Sapporo Kani Honke)', notes: '品嚐美味的螃蟹料理。' },
+          { id: 'e2-3', time: '14:30', activity: '白色戀人公園 Shiroi Koibito Park', notes: '夢幻的巧克力觀光工廠，適合全家拍照。' },
+          { id: 'e2-4', time: '18:30', activity: '晚餐：湯咖哩 GARAKU (Soup Curry GARAKU)', notes: '札幌代表性美食。' }
+        ]
+      },
+      {
+        day: 4,
+        date: '2026-06-20',
+        category: 'hokkaido',
+        events: [
+          { id: 'e3-1', time: '09:30', activity: '小樽一日遊 Otaru Day Trip', notes: '搭乘JR函館本線前往小樽（約30-40分鐘）。' },
+          { id: 'e3-2', time: '11:00', activity: '小樽運河與音樂盒堂 Otaru Canal & Music Box Museum', notes: '沿運河漫步，參觀精緻的音樂盒。' },
+          { id: 'e3-3', time: '13:00', activity: '午餐：政壽司 (Sushizen) 或三角市場海鮮丼', notes: '新鮮極致的海鮮體驗。' },
+          { id: 'e3-4', time: '15:00', activity: '北一硝子館與堺町通商店街 Kitaichi Glass & Sakaimachi Street', notes: '品嚐著名的六花亭、北菓樓與 LeTAO 雙層乳酪蛋糕。' },
+          { id: 'e3-5', time: '18:00', activity: '返回札幌並晚餐 Return to Sapporo & Dinner', notes: '晚餐於札幌站周邊購物商場用餐。' }
+        ]
+      },
+      {
+        day: 5,
+        date: '2026-06-21',
+        category: 'hokkaido',
+        events: [
+          { id: 'e4-1', time: '10:00', activity: '辦理京急EX酒店退房 Check-out Keikyu EX Hotel', notes: '行李可寄放櫃台（保留後續入住的行李）或隨身帶至溫泉飯店。' },
+          { id: 'e4-2', time: '12:30', activity: '前往 JR 札幌車站北口團體巴士站', notes: '準備搭乘定山溪 Grand Blissen 酒店的免費接送巴士。' },
+          { id: 'e4-3', time: '13:00', activity: '接送巴士出發 Free Shuttle Bus Depart to Jozankei', notes: '巴士準時出發，車程約 1 小時。' },
+          { id: 'e4-4', time: '14:30', activity: '抵達並辦理入住：定山溪Grand Blissen酒店 Check-in at Grand Blissen Hotel', notes: '享受精緻的日西合璧客房及溫泉全景浴池。' },
+          { id: 'e4-5', time: '18:00', activity: '晚餐：飯店奢華溫泉懷石晚餐 Buffet/Kaiseki Dinner', notes: '品嚐北海道當地季節性新鮮食材烹調的美食。' }
+        ]
+      },
+      {
+        day: 6,
+        date: '2026-06-22',
+        category: 'hokkaido',
+        events: [
+          { id: 'e5-1', time: '08:30', activity: '精緻早餐 Enjoy Hotel Breakfast', notes: '悠閒享用飯店早餐。' },
+          { id: 'e5-2', time: '10:00', activity: '定山溪溫泉老街與二見吊橋 Jozankei Onsen & Futami Suspension Bridge', notes: '漫步溪谷，觀賞二見吊橋的絕美河谷景致。' },
+          { id: 'e5-3', time: '12:00', activity: '溫泉街午餐或岩戶觀音堂 Lanch at Onsen Street', notes: '造訪當地特色咖啡廳與足湯公園。' },
+          { id: 'e5-4', time: '15:00', activity: '回飯店享受露天溫泉與設施 Premium Onsen Relaxing', notes: '體驗無色無味卻極度滋潤的天然溫泉。' },
+          { id: 'e5-5', time: '18:30', activity: '晚餐：豪華法式/日式融合晚宴 Hotel Kaiseki Dinner', notes: '第二晚的主廚特別晚宴。' }
+        ]
+      },
+      {
+        day: 7,
+        date: '2026-06-23',
+        category: 'hokkaido',
+        events: [
+          { id: 'e6-1', time: '09:00', activity: '早餐與退房準備 Check-out Preparation', notes: '辦理退房，準備搭乘回程接送巴士。' },
+          { id: 'e6-2', time: '10:45', activity: '搭乘免費接送巴士返札幌 Return Shuttle Bus to Sapporo', notes: '由 Grand Blissen Hotel 定山溪出發。' },
+          { id: 'e6-3', time: '11:45', activity: '抵達 JR 札幌車站北口 Arrive at JR Sapporo Station', notes: '步行至京急EX酒店寄放行李。' },
+          { id: 'e6-4', time: '13:00', activity: '午餐：根室花丸迴轉壽司 (Nemuro Hanamaru)', notes: '位於 Stellar Place 內的人氣迴轉壽司。' },
+          { id: 'e6-5', time: '15:00', activity: '入住京急EX酒店札幌 Check-in Keikyu EX Hotel', notes: '開啟第二段在札幌的住宿行程。' },
+          { id: 'e6-6', time: '18:00', activity: '晚餐：達摩成吉思汗烤肉 (Genghis Khan Daruma)', notes: '香氣逼人的羊肉鐵板燒。' }
+        ]
+      },
+      {
+        day: 8,
+        date: '2026-06-24',
+        category: 'hokkaido',
+        events: [
+          { id: 'e7-1', time: '09:30', activity: '莫埃來沼公園 Moerenuma Park', notes: '由名雕刻家野口勇設計，融合幾何藝術與自然美景的大型公園，可租自行車。' },
+          { id: 'e7-2', time: '13:00', activity: '午餐：札幌拉麵橫丁 (Sapporo Ramen Yokocho)', notes: '隱藏在薄野區的傳統拉麵巷。' },
+          { id: 'e7-3', time: '15:30', activity: '狸小路商店街購物 Shopping at Tanukikoji Shopping Street', notes: '藥妝、伴手禮一次採購完畢。' },
+          { id: 'e7-4', time: '18:00', activity: '藻岩山纜車百萬夜景 Mt. Moiwa Ropeway Night View', notes: '日本新三大夜景之一，搭乘纜車登上展望台俯瞰札幌。' }
+        ]
+      },
+      {
+        day: 9,
+        date: '2026-06-25',
+        category: 'hokkaido',
+        events: [
+          { id: 'e8-1', time: '08:00', activity: '富良野與美瑛一日遊 Furano & Biei Day Trip', notes: '自駕或搭乘觀光巴士前往。' },
+          { id: 'e8-2', time: '10:30', activity: '富田農場薰衣草花田 Farm Tomita Lavender Field', notes: '六月底正值薰衣草初開，彩虹花田景色如畫。' },
+          { id: 'e8-3', time: '12:30', activity: '午餐：富良野哈密瓜與咖哩歐姆飯 Furano Lunch', notes: '享受富良野大自然恩惠的美味。' },
+          { id: 'e8-4', time: '14:30', activity: '白金青池與四季彩之丘 Shirogane Blue Pond & Shikisai-no-Oka', notes: '湛藍的神祕池水與拼布般的花卉丘陵。' },
+          { id: 'e8-5', time: '19:30', activity: '返回札幌市區晚餐 Back to Sapporo & Dinner', notes: '享用美味的海鮮居酒屋。' }
+        ]
+      },
+      {
+        day: 10,
+        date: '2026-06-26',
+        category: 'hokkaido',
+        events: [
+          { id: 'e9-1', time: '09:00', activity: '旭山動物園一日遊 Asahiyama Zoo Day Trip', notes: '搭乘特急列車前往旭川（約85分鐘），再轉搭巴士。' },
+          { id: 'e9-2', time: '11:00', activity: '觀賞企鵝遊行與極地動物 Penguins & Polar Bears Show', notes: '全日本最受歡迎、最自然化的生態動物園。' },
+          { id: 'e9-3', time: '13:30', activity: '午餐：動物園內或旭川拉麵村 Lunch at Asahikawa', notes: '旭川著名的醬油拉麵。' },
+          { id: 'e9-4', time: '16:00', activity: '返回札幌市區 Return to Sapporo', notes: '車上稍作休息。' },
+          { id: 'e9-5', time: '19:00', activity: '晚餐：串鳥燒鳥 (Kushidori Yakitori)', notes: '北海道極具人氣的美味串燒連鎖。' }
+        ]
+      },
+      {
+        day: 11,
+        date: '2026-06-27',
+        category: 'hokkaido',
+        events: [
+          { id: 'e10-1', time: '08:30', activity: '札幌二條市場海鮮早餐 Nijo Market Seafood Breakfast', notes: '品嚐現烤海鮮、鮭魚卵丼飯。' },
+          { id: 'e10-2', time: '10:30', activity: '札幌啤酒博物館 Sapporo Beer Museum', notes: '了解北海道啤酒發展史，並品嚐新鮮釀造啤酒。' },
+          { id: 'e10-3', time: '13:00', activity: '午餐：成吉思汗烤肉或湯咖哩 Lunch around Sapporo Station', notes: '札幌車站周邊美食。' },
+          { id: 'e10-4', time: '15:00', activity: '札幌電視塔與大通公園 Sapporo TV Tower Visit', notes: '登塔俯瞰大通公園綠廊（約需購票）。' },
+          { id: 'e10-5', time: '18:00', activity: '晚餐：和牛燒肉牛肉壽喜燒 Yakiniku/Sukiyaki Dinner', notes: '高級北海道和牛晚餐。' }
+        ]
+      },
+      {
+        day: 12,
+        date: '2026-06-28',
+        category: 'hokkaido',
+        events: [
+          { id: 'e11-1', time: '09:30', activity: '羊之丘展望台 Hitsujigaoka Observation Hill', notes: '遠眺札幌市區與廣闊牧草地，與克拉克博士雕像合照。' },
+          { id: 'e11-2', time: '12:30', activity: '午餐：展望台成吉思汗烤肉烤羊肉 Lunch at Hitsujigaoka', notes: '在草原美景前用餐。' },
+          { id: 'e11-3', time: '15:00', activity: '市區最後採買 Last Minute Shopping', notes: '於大丸百貨、Bic Camera 做電器與美妝補貨。' },
+          { id: 'e11-4', time: '18:00', activity: '整理行李與享用豐盛晚餐 Packing & Farewell Dinner', notes: '在北海道的最後一晚！' }
+        ]
+      },
+      {
+        day: 13,
+        date: '2026-06-29',
+        category: 'hokkaido',
+        events: [
+          { id: 'e12-1', time: '10:00', activity: '辦理退房與前往新千歲機場 Check-out & Travel to Airport', notes: '搭乘快速 Airport 號前往機場。' },
+          { id: 'e12-2', time: '12:00', activity: '新千歲機場辦理登機手續 Flight Check-in', notes: '於華航櫃台托運行李。' },
+          { id: 'e12-3', time: '13:00', activity: '新千歲機場美食街午餐 Lunch at New Chitose Airport', notes: '機場擁有著名的拉麵道場和Royce巧克力工廠，極度好逛！' },
+          { id: 'e12-4', time: '15:00', activity: '搭乘華航 CI 131 返回台灣 Flight CTS ➔ TPE', notes: '預計於 18:10 抵達台北桃園國際機場。' },
+          { id: 'e12-5', time: '18:10', activity: '抵達桃園機場並辦理入境 Arrive at TPE T2', notes: '通關並提領行李。' },
+          { id: 'e12-6', time: '19:30', activity: '搭乘桃捷/計程車前往桃園高鐵站 Transfer to HSR Taoyuan Station', notes: '準備南下台南。' },
+          { id: 'e12-7', time: '20:10', activity: '搭乘高鐵 HSR 853 號 (桃園 ➔ 台南) 🚅', notes: '車票已預訂！座位在 Car 4, Seats 5A, 5B, 5C, 5D。預計 21:32 抵達台南。' },
+          { id: 'e12-8', time: '22:00', activity: '抵達台南並入住：台南富信大飯店 Check-in at Fushin Hotel Tainan', notes: '搭乘計程車抵達飯店。好好休息！' }
+        ]
+      },
+
+      // --- TAINAN (Day 14 - 20) ---
+      {
+        day: 14,
+        date: '2026-06-30',
+        category: 'tainan',
+        events: [
+          { id: 'e13-1', time: '09:00', activity: '飯店享用中西自助式早餐 Hotel Breakfast', notes: '吃飽準備探索府城。' },
+          { id: 'e13-2', time: '10:00', activity: '赤崁樓與周邊古蹟散步 Chihkan Tower Tour', notes: '參觀歷史悠久的赤崁樓。' },
+          { id: 'e13-3', time: '12:00', activity: '午餐：石精臼牛肉湯與小吃 Beef Soup Lunch', notes: '台南招牌現宰溫體牛肉湯。' },
+          { id: 'e13-4', time: '14:30', activity: '林百貨與孔廟商圈 Hayashi Department Store & Confucius Temple', notes: '極具日治時期風味的指針電梯與文創商店。' },
+          { id: 'e13-5', time: '18:30', activity: '晚餐：度小月擔仔麵或在地小吃 Danzai Noodles Dinner', notes: '探訪國華街與正興街美食。' }
+        ]
+      },
+      {
+        day: 15,
+        date: '2026-07-01',
+        category: 'tainan',
+        events: [
+          { id: 'e14-1', time: '09:30', activity: '奇美博物館 Chimei Museum', notes: '彷彿置身歐洲的雄偉白色宮殿，欣賞西洋藝術、兵器與樂器館藏。' },
+          { id: 'e14-2', time: '13:00', activity: '午餐：博物館餐廳或周邊美食 Chimei Lunch', notes: '悠閒享用餐點。' },
+          { id: 'e14-3', time: '15:00', activity: '十鼓文創園區 Ten Drum Cultural Creative Park', notes: '老糖廠改建的極限挑戰與打擊樂表演（非常適合親子）。' },
+          { id: 'e14-4', time: '18:30', activity: '晚餐：保安路與海安路小吃 Baoan Road Food Tour', notes: '蝦仁飯、阿明豬心冬粉。' }
+        ]
+      },
+      {
+        day: 16,
+        date: '2026-07-02',
+        category: 'tainan',
+        events: [
+          { id: 'e15-1', time: '09:30', activity: '四草綠色隧道 Sicao Green Tunnel', notes: '搭乘竹筏穿梭在有「台灣版亞馬遜河」之稱的紅樹林綠色隧道中。' },
+          { id: 'e15-2', time: '11:30', activity: '安平老街與安平古堡 Anping Old Street & Fort Zeelandia', notes: '探尋安平劍獅與荷蘭遺跡。' },
+          { id: 'e15-3', time: '12:30', activity: '午餐：安平周氏蝦捲與同記安平豆花 Anping Local Foods', notes: '必吃的蝦捲與滑嫩古早味豆花。' },
+          { id: 'e15-4', time: '14:30', activity: '安平樹屋與德記洋行 Anping Tree House', notes: '榕樹根部與老倉庫共生的奇幻景致。' },
+          { id: 'e15-5', time: '18:00', activity: '晚餐：花園夜市 Garden Night Market', notes: '台南最大的夜市（營業時間四、六、日），大快朵頤！' }
+        ]
+      },
+      {
+        day: 17,
+        date: '2026-07-03',
+        category: 'tainan',
+        events: [
+          { id: 'e16-1', time: '10:00', activity: '藍晒圖文創園區 Blueprint Cultural & Creative Park', notes: '立體 3D 藍晒圖塗鴉與手作文創商店。' },
+          { id: 'e16-2', time: '12:30', activity: '午餐：新光三越西門商圈美食 Lunch at Ximen District', notes: '吹冷氣享用午餐。' },
+          { id: 'e16-3', time: '15:00', activity: '神農街與正興街文青散策 Shennong Street Retro Walk', notes: '傍晚時分，紅燈籠亮起的老街，極具氛圍。' },
+          { id: 'e16-4', time: '18:30', activity: '晚餐：台南老字號沙茶爐海鮮火鍋 Shacha Hotpot', notes: '溫暖香醇的沙茶火鍋。' }
+        ]
+      },
+      {
+        day: 18,
+        date: '2026-07-04',
+        category: 'tainan',
+        events: [
+          { id: 'e17-1', time: '09:30', activity: '北門水晶教堂與遊客中心 Beimen Crystal Church', notes: '浪漫的純白地景教堂。' },
+          { id: 'e17-2', time: '12:00', activity: '午餐：北門在地海鮮小吃 Seafood Lunch', notes: '品嚐現撈魚介。' },
+          { id: 'e17-3', time: '15:00', activity: '井仔腳瓦盤鹽田 Jingzaijiao Tile-paved Salt Fields', notes: '台灣最古老的現存鹽田，黃昏時分倒映落日與橘紅雲彩，美不勝收！' },
+          { id: 'e17-4', time: '18:30', activity: '晚餐：返回台南市區享用土魠魚羹或鱔魚意麵 Eel Noodles Dinner', notes: '台南特有的偏甜鱔魚意麵。' }
+        ]
+      },
+      {
+        day: 19,
+        date: '2026-07-05',
+        category: 'tainan',
+        events: [
+          { id: 'e18-1', time: '10:00', activity: '國立臺灣歷史博物館 National Museum of Taiwan History', notes: '了解台灣從史前至今的歷史脈絡，展覽互動豐富。' },
+          { id: 'e18-2', time: '12:30', activity: '午餐：永樂市場與國華街三段美食 Yongle Market Feast', notes: '金得春捲、富盛號碗粿、阿松割包。' },
+          { id: 'e18-3', time: '15:00', activity: '台南美術館二館 Tainan Art Museum Building 2', notes: '前衛現代的白色五角形建築，是全台最美美術館之一。' },
+          { id: 'e18-4', time: '18:00', activity: '晚餐：大東夜市 Dadong Night Market', notes: '夜市必吃滷味、地瓜球、烤肉。' }
+        ]
+      },
+      {
+        day: 20,
+        date: '2026-07-06',
+        category: 'tainan',
+        events: [
+          { id: 'e19-1', time: '09:00', activity: '台南富信大飯店退房 Check-out Fushin Hotel', notes: '行李收拾整齊。搭計程車前往台南高鐵站。' },
+          { id: 'e19-2', time: '11:00', activity: '抵達高鐵台南站 Arrive at Tainan HSR', notes: '準備高鐵票。' },
+          { id: 'e19-3', time: '11:48', activity: '搭乘高鐵 HSR 638 號 (台南 ➔ 台北) 🚅', notes: '車票已預訂！座位在 Car 3, Seats 8A, 8B, 8C, 8D。預計 13:32 抵達台北車站。' },
+          { id: 'e19-4', time: '13:45', activity: '搭乘捷運或計程車至台北茹曦酒店 Transfer to Hotel', notes: '位於敦化北路100號（台北小巨蛋對面）。' },
+          { id: 'e19-5', time: '14:30', activity: '辦理酒店入住 Check-in at Illume Taipei', notes: '辦理兩間標準雙床房入住，放妥行李。' },
+          { id: 'e19-6', time: '16:00', activity: '微風南京或台北小巨蛋散步 City Walk near Arena', notes: '周邊百貨林立，生活機能極佳。' },
+          { id: 'e19-7', time: '18:00', activity: '晚餐：茹曦酒店周邊精緻餐廳或慶城街海南雞飯', notes: '第一天在台北的晚餐，輕鬆悠閒。' }
+        ]
+      },
+
+      // --- TAIPEI (Day 21 - 29) ---
+      {
+        day: 21,
+        date: '2026-07-07',
+        category: 'taipei',
+        events: [
+          { id: 'e20-1', time: '09:00', activity: '出發前往國立故宮博物院 National Palace Museum', notes: '搭乘捷運至士林站轉公車。' },
+          { id: 'e20-2', time: '09:30', activity: '故宮珍寶導覽 Palace Museum Tour', notes: '欣賞翠玉白菜、肉形石等珍貴國寶歷史遺產。' },
+          { id: 'e20-3', time: '12:30', activity: '午餐：故宮晶華 (Silks Palace) 或士林商圈', notes: '故宮旁精緻的粵菜。' },
+          { id: 'e20-4', time: '14:30', activity: '士林官邸花園散步 Shilin Official Residence', notes: '漫步綠林溫室，感受蔣公故居歷史。' },
+          { id: 'e20-5', time: '18:00', activity: '晚餐：士林夜市美食 Shilin Night Market', notes: '大腸包小腸、豪大大雞排、生炒花枝。' }
+        ]
+      },
+      {
+        day: 22,
+        date: '2026-07-08',
+        category: 'taipei',
+        events: [
+          { id: 'e21-1', time: '10:00', activity: '台北101觀景台 Taipei 101 Observatory', notes: '搭乘超高速電梯，直達 89 樓俯瞰全大台北市景。' },
+          { id: 'e21-2', time: '12:30', activity: '午餐：鼎泰豐 101 店 (Din Tai Fung)', notes: '享用世界級的黃金 18 摺小籠包。' },
+          { id: 'e21-3', time: '14:30', activity: '信義商圈購物 Shopping at Xinyi District', notes: '造訪微風信義、新光三越、ATT 4 FUN 等。' },
+          { id: 'e21-4', time: '16:30', activity: '象山自然步道健行 Xiangshan Trail Sunset Hike', notes: '拾級而上（約20-30分鐘），欣賞落日餘暉與台北 101 同框經典畫面。' },
+          { id: 'e21-5', time: '19:00', activity: '晚餐：信義區景觀餐廳或美食街 Local Dinner', notes: '精緻一餐。' }
+        ]
+      },
+      {
+        day: 23,
+        date: '2026-07-09',
+        category: 'taipei',
+        events: [
+          { id: 'e22-1', time: '09:00', activity: '九份、十分包車一日遊 Jiufen & Shifen Day Trip', notes: '推薦包車前往，便利輕鬆。' },
+          { id: 'e22-2', time: '10:00', activity: '十分瀑布與十分老街放天燈 Shifen Waterfall & Lanterns', notes: '觀賞氣勢磅礡的瀑布，並在火車軌道旁放天燈許願。' },
+          { id: 'e22-3', time: '13:00', activity: '九份老街與茶樓巡禮 Jiufen Old Street', notes: '漫步充滿日式韻味的九份石階、阿妹茶樓，品嚐賴阿婆芋圓與草仔粿。' },
+          { id: 'e22-4', time: '16:30', activity: '黃金瀑布與陰陽海 Golden Waterfall & Yin Yang Sea', notes: '奇特的大自然地質景致。' },
+          { id: 'e22-5', time: '19:00', activity: '返回台北晚餐 Return to Taipei & Dinner', notes: '晚餐可於 Raohe Night Market 饒河夜市享用胡椒餅、藥燉排骨。' }
+        ]
+      },
+      {
+        day: 24,
+        date: '2026-07-10',
+        category: 'taipei',
+        events: [
+          { id: 'e23-1', time: '09:30', activity: '中正紀念堂與憲兵交接 CKS Memorial Hall Check', notes: '觀看壯觀的主體建築與整點憲兵交接儀式。' },
+          { id: 'e23-2', time: '11:30', activity: '永康街散策與午餐 Yongkang Street Food', notes: '享用永康牛肉麵，並吃一碗清涼消暑的芒果雪花冰。' },
+          { id: 'e23-3', time: '14:30', activity: '華山1914文創園區 Huashan Creative Park', notes: '舊酒廠改建，充滿文創市集、展覽與綠意。' },
+          { id: 'e23-4', time: '18:00', activity: '晚餐：青葉新台菜或特色台菜餐廳 Taiwanese Dinner', notes: '享用經典家常台菜。' }
+        ]
+      },
+      {
+        day: 25,
+        date: '2026-07-11',
+        category: 'taipei',
+        events: [
+          { id: 'e24-1', time: '09:30', activity: '北投溫泉鄉漫步 Beitou Hot Spring Tour', notes: '搭乘捷運至新北投。參觀北投圖書館、地熱谷。' },
+          { id: 'e24-2', time: '12:00', activity: '午餐：北投蓬萊排骨酥或溫泉拉麵 Lunch at Beitou', notes: '極具台式風味的排骨酥。' },
+          { id: 'e24-3', time: '14:30', activity: '淡水老街與古蹟遊歷 Tamsui Old Street Visit', notes: '淡水紅毛城、真理大學。' },
+          { id: 'e24-4', time: '17:30', activity: '漁人碼頭欣賞落日 Tamsui Fisherman\'s Wharf Sunset', notes: '漫步情人橋，在夕陽與海風中共度。' },
+          { id: 'e24-5', time: '19:00', activity: '晚餐：淡水海鮮或在地特色小吃阿給 Tamsui Dinner', notes: '淡水阿給、魚酥、魚丸湯。' }
+        ]
+      },
+      {
+        day: 26,
+        date: '2026-07-12',
+        category: 'taipei',
+        events: [
+          { id: 'e25-1', time: '10:00', activity: '松山文創園區 Songshan Cultural Park', notes: '走訪松菸誠品與古老菸廠建築。' },
+          { id: 'e25-2', time: '12:30', activity: '午餐：誠品生活內餐廳或周邊網紅美食 Studio Lunch', notes: '豐富選擇。' },
+          { id: 'e25-3', time: '15:00', activity: '國父紀念館與大巨蛋散步 Sun Yat-sen Memorial Hall & Dome', notes: '開闊的廣場，遙望台北101與台北大巨蛋。' },
+          { id: 'e25-4', time: '18:00', activity: '晚餐：饒河街觀光夜市 Raohe Night Market', notes: '品嚐著名的福州世祖胡椒餅、東發號麵線、陳董藥燉排骨。' }
+        ]
+      },
+      {
+        day: 27,
+        date: '2026-07-13',
+        category: 'taipei',
+        events: [
+          { id: 'e26-1', time: '09:00', activity: '台北市立動物園 Taipei Zoo', notes: '搭乘捷運文湖線直達。造訪大貓熊、企鵝館與非洲動物區。' },
+          { id: 'e26-2', time: '12:30', activity: '貓空纜車與山頂午茶 Maokong Gondola & Tea House', notes: '搭乘纜車登頂貓空，眺望群山並在茶餐廳喝茶品茗。' },
+          { id: 'e26-3', time: '16:00', activity: '返回飯店稍作休息 Rest at Hotel', notes: '洗把臉或睡個午覺。' },
+          { id: 'e26-4', time: '18:30', activity: '晚餐：馬辣頂級麻辣鴛鴦火鍋 Mala Hotpot', notes: '暢快大口吃海鮮與頂級肉品。' }
+        ]
+      },
+      {
+        day: 28,
+        date: '2026-07-14',
+        category: 'taipei',
+        events: [
+          { id: 'e27-1', time: '09:30', activity: '大稻埕與迪化街散策 Dadaocheng & Dihua Street Walk', notes: '探索台北最古老的中藥、南北貨與文創中街，求姻緣的霞海城隍廟。' },
+          { id: 'e27-2', time: '12:00', activity: '午餐：迪化街傳統小吃或復古咖啡館 Lunch at Dihua Street', notes: '如旗魚米粉、土魠魚羹等。' },
+          { id: 'e27-3', time: '15:00', activity: '大稻埕碼頭貨櫃市集 Dadaocheng Pier Container Market', notes: '傍晚時分，在碼頭邊吹微風，聽歌喝飲品，觀看唯美的淡水河夕陽。' },
+          { id: 'e27-4', time: '18:30', activity: '晚餐：西門町商圈與老字號餐廳 Ximending Food Hunt', notes: '鴨肉扁、阿宗麵線、美觀園日本料理。' }
+        ]
+      },
+      {
+        day: 29,
+        date: '2026-07-15',
+        category: 'taipei',
+        events: [
+          { id: 'e28-1', time: '11:00', activity: '辦理茹曦酒店退房並寄存行李 Check-out Illume Taipei', notes: '今天是旅途最後一天，盡情享受。' },
+          { id: 'e28-2', time: '12:00', activity: '午餐：上引水產海鮮盛宴 Addition Mitsui Seafood', notes: '站立吞食新鮮生魚片、炭烤海鮮等。' },
+          { id: 'e28-3', time: '15:00', activity: '台北東區或中山商圈散步 Last Shopping Spree', notes: '做最後的伴手禮（佳德鳳梨酥、糖村牛軋糖）與日用品補充。' },
+          { id: 'e28-4', time: '18:00', activity: '返飯店取行李與晚餐 Packing and Airport departure', notes: '晚餐後，預約機場接送或搭乘桃捷前往桃園機場（約1小時）。' },
+          { id: 'e28-5', time: '20:30', activity: '抵達桃園機場二航廈 Arrive at TPE T2', notes: '於華航櫃台辦理登機，托運行李。' },
+          { id: 'e28-6', time: '23:40', activity: '搭乘華航 CI 004 返回舊金山 Flight TPE ➔ SFO ✈️', notes: '回程約需 11 小時。預計於同日 19:40 抵達舊金山 (SFO)，為完美旅程劃下句點。' }
+        ]
+      }
+    ];
+
+    // 翻譯字典 (Traditional Chinese & English)
+    const dict = {
+      zh: {
+        siteTitle: '2026 日本札幌-台灣家庭旅遊',
+        subtitle: '📅 每日日程規劃 • 住宿細節 • 飛機航班 • 行李待辦系統',
+        langBtn: 'English / 英文',
+        tabs: {
+          itinerary: '每日行程表',
+          flights: '飛機航班',
+          hotels: '酒店住宿',
+          packing: '行李清單',
+          todo: '待辦事項'
+        },
+        cats: {
+          hokkaido: '🇯🇵 日本北海道',
+          tainan: '🇹🇼 台灣台南',
+          taipei: '🇹🇼 台灣台北'
+        },
+        days: '天數行程',
+        addEvent: '＋ 新增行程項目',
+        deleteEvent: '刪除',
+        editEvent: '編輯',
+        save: '儲存',
+        cancel: '取消',
+        addNewBtn: '確認新增',
+        time: '時間',
+        activity: '活動 / 景點',
+        notes: '備註細節',
+        actions: '操作',
+        flightDetail: '華航 2026 預訂代號：FDS5EB',
+        seats: '座位配置',
+        segment: '第 {num} 段航線',
+        checkin: '入住',
+        checkout: '退房',
+        nights: '晚',
+        address: '地址',
+        trainNo: '高鐵車次',
+        route: '區間',
+        hsrTicket: '台灣高鐵 (THSR) 車票細節',
+        noBudgetMsg: '⚠️ 為維護休閒心情，本系統不列出預算與支出明細 🍃',
+        addPackItem: '新增行李項目',
+        addTodoItem: '新增待辦事項',
+        exportBtn: '📥 匯出行程備份 (JSON)',
+        importBtn: '📤 匯入行程檔案',
+        backupSuccess: '行程備份匯出成功！您可以將 JSON 檔案妥善保存。',
+        importSuccess: '行程檔案匯入成功！'
+      },
+      en: {
+        siteTitle: '2026 Japan Sapporo & Taiwan Family Trip',
+        subtitle: '📅 Daily Itinerary • Lodging • Flights • Packing & To-Do Planner',
+        langBtn: '中文 / Traditional Chinese',
+        tabs: {
+          itinerary: 'Daily Itinerary',
+          flights: 'Flights',
+          hotels: 'Hotels',
+          packing: 'Packing List',
+          todo: 'To-Do List'
+        },
+        cats: {
+          hokkaido: '🇯🇵 Hokkaido, Japan',
+          tainan: '🇹🇼 Tainan, Taiwan',
+          taipei: '🇹🇼 Taipei, Taiwan'
+        },
+        days: 'Daily Itinerary Planner',
+        addEvent: '＋ Add Itinerary Event',
+        deleteEvent: 'Delete',
+        editEvent: 'Edit',
+        save: 'Save',
+        cancel: 'Cancel',
+        addNewBtn: 'Confirm Add',
+        time: 'Time',
+        activity: 'Activity / Spot',
+        notes: 'Memos / Notes',
+        actions: 'Actions',
+        flightDetail: 'China Airlines Reservation Code: FDS5EB',
+        seats: 'Seats Assignment',
+        segment: 'Segment {num}',
+        checkin: 'Check-In',
+        checkout: 'Check-Out',
+        nights: 'Nights',
+        address: 'Address',
+        trainNo: 'Train No.',
+        route: 'Route',
+        hsrTicket: 'Taiwan High Speed Rail (THSR) Ticket',
+        noBudgetMsg: '⚠️ No budgets or expenses are listed to maintain a relaxing vacation mind! 🍃',
+        addPackItem: 'Add Pack Item',
+        addTodoItem: 'Add To-Do',
+        exportBtn: '📥 Export Trip Plan (JSON)',
+        importBtn: '📤 Import Trip Plan',
+        backupSuccess: 'Itinerary exported successfully! Save your JSON file safely.',
+        importSuccess: 'Itinerary imported successfully!'
+      }
+    };
+
+    // ==========================================
+    // APP 主要元件
+    // ==========================================
+
+    // NOTE: Firestore 文件參考路徑
+    const TRAVEL_DOC_REF = db.collection('2026_travel').doc('travel');
+
+    /**
+     * 登入畫面元件
+     * @param {Object} props
+     * @param {Function} props.onLogin Google 登入觸發
+     * @param {string|null} props.error 錯誤訊息
+     * @param {boolean} props.signingIn 登入中狀態
+     */
+    function LoginScreen({ onLogin, error, signingIn }) {
+      return (
+        <div className="login-bg min-h-screen flex items-center justify-center p-4">
+          <div className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-8 sm:p-12 max-w-md w-full text-center border border-white/50">
+            <div className="bg-gradient-to-tr from-pink-400 to-emerald-400 p-4 rounded-full text-white shadow-lg mx-auto w-20 h-20 flex items-center justify-center mb-6">
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+              </svg>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-800 mb-2">2026 家庭旅遊</h1>
+            <p className="text-sm text-slate-500 mb-1">日本札幌 • 台灣台南 • 台灣台北</p>
+            <p className="text-xs text-slate-400 mb-8">Japan Sapporo & Taiwan Family Trip Planner</p>
+
+            {error && (
+              <div className="bg-red-50 text-red-700 text-sm font-bold p-3 rounded-xl border border-red-200 mb-6">
+                ⚠️ {error}
+              </div>
+            )}
+
+            <button
+              onClick={onLogin}
+              disabled={signingIn}
+              className="google-btn w-full flex items-center justify-center gap-3 bg-white border-2 border-slate-200 rounded-2xl px-6 py-4 font-bold text-slate-700 hover:border-pink-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {signingIn ? (
+                <div className="spinner" style={{width:20,height:20,borderWidth:3}}></div>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+              )}
+              {signingIn ? '登入中...' : '使用 Google 帳號登入'}
+            </button>
+
+            <p className="text-[10px] text-slate-400 mt-6">僅限授權家庭成員登入 • Authorized family members only</p>
+          </div>
+        </div>
+      );
+    }
+
+    /**
+     * Loading 畫面元件
+     */
+    function LoadingScreen() {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
+          <div className="spinner"></div>
+          <p className="text-sm text-slate-500 font-bold">載入行程資料中...</p>
+        </div>
+      );
+    }
+
+    function App() {
+      // 認證狀態
+      const [user, setUser] = useState(null);
+      const [authLoading, setAuthLoading] = useState(true);
+      const [authError, setAuthError] = useState(null);
+      const [signingIn, setSigningIn] = useState(false);
+
+      // UI 狀態
+      const [lang, setLang] = useState('zh');
+      const [activeTab, setActiveTab] = useState('itinerary');
+      const [selectedCategory, setSelectedCategory] = useState('hokkaido');
+      const [selectedDay, setSelectedDay] = useState(1);
+
+      // 資料狀態（從 Firestore 載入）
+      const [dataLoading, setDataLoading] = useState(true);
+      const [itinerary, setItinerary] = useState(defaultItinerary);
+      const [packingList, setPackingList] = useState(defaultPackingList);
+      const [todos, setTodos] = useState(defaultTodos);
+
+      // 固定資料（不存入 Firestore）
+      const [flights] = useState(defaultFlights);
+      const [hotels] = useState(defaultHotels);
+      const [hsr] = useState(defaultHsr);
+
+      // NOTE: 監聽 Firebase Auth 狀態變化，持久化登入
+      useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+          if (firebaseUser) {
+            if (ALLOWED_EMAILS.includes(firebaseUser.email)) {
+              setUser(firebaseUser);
+              setAuthError(null);
+            } else {
+              // 不在白名單內，強制登出
+              auth.signOut();
+              setUser(null);
+              setAuthError('此帳號未獲授權。請使用家庭成員的 Google 帳號登入。');
+            }
+          } else {
+            setUser(null);
+          }
+          setAuthLoading(false);
+        });
+        return () => unsubscribe();
+      }, []);
+
+      // NOTE: 當用戶已登入時，使用 onSnapshot 監聽 Firestore 即時更新
+      useEffect(() => {
+        if (!user) {
+          setDataLoading(false);
+          return;
+        }
+        setDataLoading(true);
+        const unsubscribe = TRAVEL_DOC_REF.onSnapshot((doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            if (data.itinerary) {
+              if (data.itinerary.length < 29) {
+                // 自動將舊的 28 天行程覆蓋為新的 29 天行程
+                setItinerary(defaultItinerary);
+                TRAVEL_DOC_REF.update({ itinerary: defaultItinerary });
+              } else {
+                setItinerary(data.itinerary);
+              }
+            }
+            if (data.packingList) setPackingList(data.packingList);
+            if (data.todos) setTodos(data.todos);
+          } else {
+            // 文件不存在時，用預設資料初始化 Firestore
+            TRAVEL_DOC_REF.set({
+              itinerary: defaultItinerary,
+              packingList: defaultPackingList,
+              todos: defaultTodos
+            });
+          }
+          setDataLoading(false);
+        }, (error) => {
+          console.error('Firestore onSnapshot error:', error);
+          setDataLoading(false);
+        });
+        return () => unsubscribe();
+      }, [user]);
+
+      /**
+       * 將指定欄位同步寫回 Firestore
+       * @param {Object} updates 要更新的欄位物件
+       */
+      const syncToFirestore = (updates) => {
+        TRAVEL_DOC_REF.update(updates).catch((err) => {
+          console.error('Firestore update failed:', err);
+        });
+      };
+
+      /**
+       * Google 登入處理
+       */
+      const handleGoogleLogin = async () => {
+        setSigningIn(true);
+        setAuthError(null);
+        try {
+          await auth.signInWithPopup(googleProvider);
+        } catch (err) {
+          console.error('Login error:', err);
+          setAuthError('登入失敗，請稍後再試。');
+        }
+        setSigningIn(false);
+      };
+
+      /**
+       * 登出處理
+       */
+      const handleLogout = () => {
+        auth.signOut();
+      };
+
+      // 行程編輯狀態（必須在所有條件返回之前宣告，遵守 React Hooks 規則）
+      const [editingEventId, setEditingEventId] = useState(null);
+      const [editForm, setEditForm] = useState({ time: '', activity: '', notes: '' });
+      const [isAddingEvent, setIsAddingEvent] = useState(false);
+      const [newForm, setNewForm] = useState({ time: '', activity: '', notes: '' });
+
+      // 行李與待辦編輯狀態
+      const [newPackItemText, setNewPackItemText] = useState({ James: '', Vicky: '', Chenn: '', Honn: '' });
+      const [newTodoText, setNewTodoText] = useState('');
+
+      // 認證載入中
+      if (authLoading) return <LoadingScreen />;
+      // 未登入，顯示登入畫面
+      if (!user) return <LoginScreen onLogin={handleGoogleLogin} error={authError} signingIn={signingIn} />;
+      // 資料載入中
+      if (dataLoading) return <LoadingScreen />;
+
+      // 切換區域時，自動將選取天數導向該區域第一天
+      const handleCategoryChange = (cat) => {
+        setSelectedCategory(cat);
+        const found = itinerary.find((item) => item.category === cat);
+        if (found) {
+          setSelectedDay(found.day);
+        }
+      };
+
+      const currentCategoryDays = itinerary.filter((item) => item.category === selectedCategory);
+      const currentDayData = itinerary.find((item) => item.day === selectedDay) || currentCategoryDays[0];
+
+      const t = dict[lang];
+
+      // 將帶有雙語的行李名稱進行簡單分流呈現
+      const getTranslatedItem = (text) => {
+        if (lang === 'zh') return text;
+        const matches = text.match(/[A-Za-z\s()/'-]+/g);
+        return matches ? matches.join(' ').trim() : text;
+      };
+
+      // ==========================================
+      // 行程表增刪改查邏輯
+      // ==========================================
+
+      const startEditEvent = (evt) => {
+        setEditingEventId(evt.id);
+        setEditForm({ time: evt.time, activity: evt.activity, notes: evt.notes });
+      };
+
+      const cancelEditEvent = () => {
+        setEditingEventId(null);
+      };
+
+      const saveEditedEvent = (dayId, evtId) => {
+        const newItinerary = itinerary.map(d => {
+          if (d.day === dayId) {
+            return { ...d, events: d.events.map(e => e.id === evtId ? { ...e, ...editForm } : e) };
+          }
+          return d;
+        });
+        setItinerary(newItinerary);
+        syncToFirestore({ itinerary: newItinerary });
+        setEditingEventId(null);
+      };
+
+      const deleteEvent = (dayId, evtId) => {
+        if (window.confirm(lang === 'zh' ? '確定要刪除此行程項目嗎？' : 'Are you sure you want to delete this event?')) {
+          const newItinerary = itinerary.map(d => {
+            if (d.day === dayId) {
+              return { ...d, events: d.events.filter(e => e.id !== evtId) };
+            }
+            return d;
+          });
+          setItinerary(newItinerary);
+          syncToFirestore({ itinerary: newItinerary });
+        }
+      };
+
+      const startAddEvent = () => {
+        setIsAddingEvent(true);
+        setNewForm({ time: '09:00', activity: '', notes: '' });
+      };
+
+      const saveNewEvent = (dayId) => {
+        if (!newForm.activity.trim()) return;
+        const newId = `e-custom-${Date.now()}`;
+        const addedEvent = { id: newId, ...newForm };
+
+        const newItinerary = itinerary.map(d => {
+          if (d.day === dayId) {
+            const updatedEvents = [...d.events, addedEvent].sort((a, b) => a.time.localeCompare(b.time));
+            return { ...d, events: updatedEvents };
+          }
+          return d;
+        });
+        setItinerary(newItinerary);
+        syncToFirestore({ itinerary: newItinerary });
+        setIsAddingEvent(false);
+      };
+
+      const moveEventToDay = (currentDayId, eventId, targetDayId) => {
+        const targetDayIdInt = parseInt(targetDayId, 10);
+        if (currentDayId === targetDayIdInt) return;
+
+        let eventToMove = null;
+        let newItinerary = itinerary.map(d => {
+          if (d.day === currentDayId) {
+            eventToMove = d.events.find(e => e.id === eventId);
+            return { ...d, events: d.events.filter(e => e.id !== eventId) };
+          }
+          return d;
+        });
+
+        if (eventToMove) {
+          newItinerary = newItinerary.map(d => {
+            if (d.day === targetDayIdInt) {
+              const updatedEvents = [...d.events, eventToMove].sort((a, b) => a.time.localeCompare(b.time));
+              return { ...d, events: updatedEvents };
+            }
+            return d;
+          });
+        }
+        
+        setItinerary(newItinerary);
+        syncToFirestore({ itinerary: newItinerary });
+        setEditingEventId(null);
+      };
+
+      // ==========================================
+      // 行李清單與待辦清單邏輯（同步至 Firestore）
+      // ==========================================
+
+      const togglePackItem = (person, itemId) => {
+        const newPacking = {
+          ...packingList,
+          [person]: packingList[person].map(item => item.id === itemId ? { ...item, checked: !item.checked } : item)
+        };
+        setPackingList(newPacking);
+        syncToFirestore({ packingList: newPacking });
+      };
+
+      const addPackItem = (person) => {
+        const text = newPackItemText[person].trim();
+        if (!text) return;
+        const newItem = { id: `pack-${person}-${Date.now()}`, text, checked: false };
+        const newPacking = { ...packingList, [person]: [...packingList[person], newItem] };
+        setPackingList(newPacking);
+        syncToFirestore({ packingList: newPacking });
+        setNewPackItemText(prev => ({ ...prev, [person]: '' }));
+      };
+
+      const deletePackItem = (person, itemId) => {
+        const newPacking = { ...packingList, [person]: packingList[person].filter(item => item.id !== itemId) };
+        setPackingList(newPacking);
+        syncToFirestore({ packingList: newPacking });
+      };
+
+      const toggleTodoItem = (todoId) => {
+        const newTodos = todos.map(t => t.id === todoId ? { ...t, checked: !t.checked } : t);
+        setTodos(newTodos);
+        syncToFirestore({ todos: newTodos });
+      };
+
+      const addTodoItem = () => {
+        if (!newTodoText.trim()) return;
+        const newTodo = { id: `todo-${Date.now()}`, text: newTodoText.trim(), checked: false };
+        const newTodos = [...todos, newTodo];
+        setTodos(newTodos);
+        syncToFirestore({ todos: newTodos });
+        setNewTodoText('');
+      };
+
+      const deleteTodoItem = (todoId) => {
+        const newTodos = todos.filter(t => t.id !== todoId);
+        setTodos(newTodos);
+        syncToFirestore({ todos: newTodos });
+      };
+
+      // ==========================================
+      // 高相容性剪貼簿複製 (解決 iframe 限制)
+      // ==========================================
+      const handleCopyText = (text) => {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        // 隱藏 textarea 避開視覺干擾
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          const successful = document.execCommand('copy');
+          if (successful) {
+            alert(lang === 'zh' ? '地址已成功複製！' : 'Address successfully copied!');
+          } else {
+            throw new Error('Fallback failed');
+          }
+        } catch (err) {
+          // 嘗試現代 Clipboard API 作為備份
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text)
+              .then(() => alert(lang === 'zh' ? '地址已成功複製！' : 'Address successfully copied!'))
+              .catch(() => alert('無法複製地址，請手動複製。'));
+          } else {
+            alert('無法複製地址，請手動複製。');
+          }
+        }
+        document.body.removeChild(textArea);
+      };
+
+      // ==========================================
+      // 匯出與匯入 JSON 檔案備份
+      // ==========================================
+
+      const handleExportPlan = () => {
+        const fullPlan = {
+          itinerary,
+          packingList,
+          todos,
+          flights,
+          hotels,
+          hsr
+        };
+        const blob = new Blob([JSON.stringify(fullPlan, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `2026_Japan_Taiwan_Trip_Plan_${lang}.json`;
+        link.click();
+        alert(t.backupSuccess);
+      };
+
+      const handleImportPlan = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const imported = JSON.parse(event.target.result);
+            const updates = {};
+            if (imported.itinerary) { setItinerary(imported.itinerary); updates.itinerary = imported.itinerary; }
+            if (imported.packingList) { setPackingList(imported.packingList); updates.packingList = imported.packingList; }
+            if (imported.todos) { setTodos(imported.todos); updates.todos = imported.todos; }
+            if (Object.keys(updates).length > 0) syncToFirestore(updates);
+            alert(t.importSuccess);
+          } catch (err) {
+            alert('無效的 JSON 行程檔案！Invalid JSON format!');
+          }
+        };
+        reader.readAsText(file);
+      };
+
+      return (
+        <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-16">
+          
+          {/* ================= HEADER ================= */}
+          <header className="bg-gradient-to-r from-pink-100 via-emerald-50 to-pink-50 border-b border-emerald-100 sticky top-0 z-50 shadow-sm backdrop-blur-md bg-opacity-95">
+            <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-tr from-pink-400 to-emerald-400 p-2.5 rounded-full text-white shadow-md">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
+                    {t.siteTitle}
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-500 font-medium">{t.subtitle}</p>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-2">
+                {/* 備份按鈕組 */}
+                <button 
+                  onClick={handleExportPlan}
+                  className="px-3 py-1.5 text-xs font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 rounded-lg shadow-sm transition-all duration-200"
+                >
+                  {t.exportBtn}
+                </button>
+                <label className="px-3 py-1.5 text-xs font-bold text-pink-800 bg-pink-100 hover:bg-pink-200 border border-pink-300 rounded-lg shadow-sm transition-all duration-200 cursor-pointer">
+                  {t.importBtn}
+                  <input type="file" accept=".json" onChange={handleImportPlan} className="hidden" />
+                </label>
+
+                {/* 語系切換 */}
+                <button 
+                  onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+                  className="px-4 py-1.5 text-xs font-bold rounded-lg shadow-md bg-white border border-slate-200 hover:border-pink-300 hover:text-pink-600 transition-all duration-200 flex items-center gap-2"
+                >
+                  🌐 {t.langBtn}
+                </button>
+
+                {/* 用戶資訊與登出 */}
+                <div className="flex items-center gap-2 ml-1 pl-2 border-l border-slate-200">
+                  {user.photoURL && (
+                    <img src={user.photoURL} alt="avatar" className="user-avatar" referrerPolicy="no-referrer" />
+                  )}
+                  <span className="text-xs font-bold text-slate-600 hidden sm:inline">{user.displayName || user.email}</span>
+                  <button
+                    onClick={handleLogout}
+                    className="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-all duration-200"
+                  >
+                    {lang === 'zh' ? '登出' : 'Logout'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* ================= MAIN TABS ================= */}
+          <nav className="max-w-7xl mx-auto px-4 mt-6">
+            <div className="flex flex-wrap items-center bg-white p-1 rounded-2xl border border-slate-200 shadow-sm gap-1 overflow-x-auto scrollbar-none">
+              <button 
+                onClick={() => setActiveTab('itinerary')}
+                className={`flex-1 min-w-[120px] text-center py-3 text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 ${
+                  activeTab === 'itinerary' 
+                    ? 'bg-pink-100 text-pink-700 shadow-sm' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                🗓️ {t.tabs.itinerary}
+              </button>
+              <button 
+                onClick={() => setActiveTab('flights')}
+                className={`flex-1 min-w-[120px] text-center py-3 text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 ${
+                  activeTab === 'flights' 
+                    ? 'bg-pink-100 text-pink-700 shadow-sm' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                ✈️ {t.tabs.flights}
+              </button>
+              <button 
+                onClick={() => setActiveTab('hotels')}
+                className={`flex-1 min-w-[120px] text-center py-3 text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 ${
+                  activeTab === 'hotels' 
+                    ? 'bg-pink-100 text-pink-700 shadow-sm' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                🏨 {t.tabs.hotels}
+              </button>
+              
+              <button 
+                onClick={() => setActiveTab('packing')}
+                className={`flex-1 min-w-[120px] text-center py-3 text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 ${
+                  activeTab === 'packing' 
+                    ? 'bg-pink-100 text-pink-700 shadow-sm' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                🎒 {t.tabs.packing}
+              </button>
+              <button 
+                onClick={() => setActiveTab('todo')}
+                className={`flex-1 min-w-[120px] text-center py-3 text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 ${
+                  activeTab === 'todo' 
+                    ? 'bg-pink-100 text-pink-700 shadow-sm' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                ✅ {t.tabs.todo}
+              </button>
+            </div>
+          </nav>
+
+          {/* ================= MAIN CONTENT ================= */}
+          <main className="max-w-7xl mx-auto px-4 mt-6">
+            
+            {/* ================= TAB: ITINERARY ================= */}
+            {activeTab === 'itinerary' && (
+              <div className="space-y-6">
+                
+                {/* 國家分區三大塊按鈕 */}
+                <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                  {Object.keys(t.cats).map((catKey) => (
+                    <button
+                      key={catKey}
+                      onClick={() => handleCategoryChange(catKey)}
+                      className={`py-3 px-2 sm:px-4 text-xs sm:text-base font-extrabold rounded-2xl shadow-sm transition-all duration-300 border ${
+                        selectedCategory === catKey 
+                          ? 'bg-emerald-500 text-white border-emerald-600 scale-[1.02] shadow-md' 
+                          : 'bg-white text-slate-600 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50'
+                      }`}
+                    >
+                      {t.cats[catKey]}
+                    </button>
+                  ))}
+                </div>
+
+                {/* 天數水平滾動分頁 */}
+                <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+                  <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+                    {t.cats[selectedCategory]} • {t.days}
+                  </span>
+                  <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2">
+                    {currentCategoryDays.map((d) => (
+                      <button
+                        key={d.day}
+                        onClick={() => setSelectedDay(d.day)}
+                        className={`h-11 min-w-[44px] px-3 text-xs sm:text-sm font-extrabold rounded-xl transition-all duration-200 flex flex-col items-center justify-center border ${
+                          selectedDay === d.day
+                            ? 'bg-pink-500 text-white border-pink-600 shadow-md scale-105'
+                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-300'
+                        }`}
+                      >
+                        <span>Day {d.day}</span>
+                        <span className="text-[9px] opacity-80">{d.date.substring(5)}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 天數日程詳細列表 */}
+                {currentDayData && (
+                  <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="bg-gradient-to-r from-pink-50 to-emerald-50 px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <h2 className="text-xl font-extrabold text-slate-800 flex items-center gap-2">
+                          <span className="bg-pink-500 text-white px-3 py-1 rounded-lg text-sm">Day {currentDayData.day}</span>
+                          <span>{currentDayData.date}</span>
+                        </h2>
+                        <p className="text-xs text-slate-500 mt-1">
+                          {lang === 'zh' ? '本頁面直向排列，依照日期時間由上往下看當日規劃。' : 'Timeline displays top-to-bottom vertically in chronological order.'}
+                        </p>
+                      </div>
+
+                      <button 
+                        onClick={startAddEvent}
+                        className="self-start sm:self-center px-4 py-2 text-xs font-extrabold text-white bg-emerald-500 hover:bg-emerald-600 rounded-xl shadow-md shadow-emerald-200 hover:shadow-lg transition-all"
+                      >
+                        {t.addEvent}
+                      </button>
+                    </div>
+
+                    {/* 行內新增行程區塊 */}
+                    {isAddingEvent && (
+                      <div className="bg-emerald-50/50 p-6 border-b border-emerald-100 space-y-4">
+                        <h3 className="font-bold text-emerald-800 text-sm">📍 {t.addEvent}</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <div>
+                            <label className="block text-xs font-bold text-slate-500 mb-1">{t.time}</label>
+                            <input 
+                              type="text" 
+                              value={newForm.time}
+                              onChange={(e) => setNewForm({ ...newForm, time: e.target.value })}
+                              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent bg-white"
+                              placeholder="HH:MM (e.g. 14:30)"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-slate-500 mb-1">{t.activity}</label>
+                            <input 
+                              type="text" 
+                              value={newForm.activity}
+                              onChange={(e) => setNewForm({ ...newForm, activity: e.target.value })}
+                              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent bg-white"
+                              placeholder="e.g. 大通公園 Odori Park"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-slate-500 mb-1">{t.notes}</label>
+                            <input 
+                              type="text" 
+                              value={newForm.notes}
+                              onChange={(e) => setNewForm({ ...newForm, notes: e.target.value })}
+                              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent bg-white"
+                              placeholder="Details or tips..."
+                            />
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => saveNewEvent(currentDayData.day)}
+                            className="px-4 py-1.5 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg shadow"
+                          >
+                            {t.addNewBtn}
+                          </button>
+                          <button 
+                            onClick={() => setIsAddingEvent(false)}
+                            className="px-4 py-1.5 text-xs font-bold text-slate-500 bg-slate-200 hover:bg-slate-300 rounded-lg"
+                          >
+                            {t.cancel}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 行程詳細表格 */}
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-slate-50 text-slate-500 text-xs font-bold border-b border-slate-100">
+                            <th className="py-4 px-6 w-24 text-center">{t.time}</th>
+                            <th className="py-4 px-6 md:w-80">{t.activity}</th>
+                            <th className="py-4 px-6">{t.notes}</th>
+                            <th className="py-4 px-6 w-32 text-center">{t.actions}</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-sm">
+                          {currentDayData.events.length === 0 ? (
+                            <tr>
+                              <td colSpan="4" className="py-12 text-center text-slate-400 font-medium">
+                                📭 {lang === 'zh' ? '當天尚無安排行程，點擊「新增項目」來規劃。' : 'No schedules mapped yet. Click "Add Event" to plan.'}
+                              </td>
+                            </tr>
+                          ) : (
+                            currentDayData.events.map((evt) => {
+                              const isEditing = editingEventId === evt.id;
+                              return (
+                                <tr key={evt.id} className="hover:bg-pink-50/20 transition-all duration-150">
+                                  {/* 時間欄位 */}
+                                  <td className="py-4 px-6 text-center font-bold text-emerald-600 bg-emerald-50/10">
+                                    {isEditing ? (
+                                      <input 
+                                        type="text" 
+                                        value={editForm.time}
+                                        onChange={(e) => setEditForm({ ...editForm, time: e.target.value })}
+                                        className="w-full text-center px-1.5 py-1 text-xs border border-slate-300 rounded focus:ring-1 focus:ring-pink-400 bg-white"
+                                      />
+                                    ) : (
+                                      evt.time
+                                    )}
+                                  </td>
+
+                                  {/* 活動標題與特殊標記 */}
+                                  <td className="py-4 px-6 font-semibold text-slate-800">
+                                    {isEditing ? (
+                                      <input 
+                                        type="text" 
+                                        value={editForm.activity}
+                                        onChange={(e) => setEditForm({ ...editForm, activity: e.target.value })}
+                                        className="w-full px-2 py-1 text-xs border border-slate-300 rounded focus:ring-1 focus:ring-pink-400 bg-white"
+                                      />
+                                    ) : (
+                                      <div className="flex flex-col gap-1">
+                                        <span className="text-slate-800 font-bold">{evt.activity}</span>
+                                        {/* 機票/高鐵/入住等圖形標籤 */}
+                                        {evt.activity.includes('CI') && (
+                                          <span className="self-start text-[10px] bg-sky-100 text-sky-800 px-2 py-0.5 rounded font-black">✈️ FLIGHT</span>
+                                        )}
+                                        {evt.activity.includes('高鐵') && (
+                                          <span className="self-start text-[10px] bg-orange-100 text-orange-800 px-2 py-0.5 rounded font-black">🚅 HSR</span>
+                                        )}
+                                        {evt.activity.includes('入住') && (
+                                          <span className="self-start text-[10px] bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-black">🏨 HOTEL CHECK-IN</span>
+                                        )}
+                                      </div>
+                                    )}
+                                  </td>
+
+                                  {/* 備註細節欄位 */}
+                                  <td className="py-4 px-6 text-slate-500 font-medium max-w-sm md:max-w-none break-words">
+                                    {isEditing ? (
+                                      <textarea 
+                                        value={editForm.notes}
+                                        onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                                        className="w-full px-2 py-1 text-xs border border-slate-300 rounded focus:ring-1 focus:ring-pink-400 bg-white"
+                                        rows="2"
+                                      />
+                                    ) : (
+                                      evt.notes
+                                    )}
+                                  </td>
+
+                                  {/* 編輯控制項 */}
+                                  <td className="py-4 px-6 text-center">
+                                    <div className="flex flex-col items-center justify-center gap-2">
+                                      {isEditing ? (
+                                        <>
+                                          <div className="flex gap-1">
+                                            <button
+                                              onClick={() => saveEditedEvent(currentDayData.day, evt.id)}
+                                              className="px-2 py-1 text-xs font-bold text-white bg-pink-500 rounded hover:bg-pink-600 shadow"
+                                            >
+                                              {t.save}
+                                            </button>
+                                            <button
+                                              onClick={cancelEditEvent}
+                                              className="px-2 py-1 text-xs font-bold text-slate-500 bg-slate-100 rounded hover:bg-slate-200"
+                                            >
+                                              {t.cancel}
+                                            </button>
+                                          </div>
+                                          <select
+                                            onChange={(e) => {
+                                              if(e.target.value) {
+                                                moveEventToDay(currentDayData.day, evt.id, e.target.value);
+                                              }
+                                            }}
+                                            className="w-full px-1 py-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 rounded border border-emerald-200 focus:outline-none"
+                                            value=""
+                                          >
+                                            <option value="" disabled>移至 Day #</option>
+                                            {itinerary.map(d => (
+                                              <option key={d.day} value={d.day}>Day {d.day}</option>
+                                            ))}
+                                          </select>
+                                        </>
+                                      ) : (
+                                        <div className="flex gap-1">
+                                          <button
+                                            onClick={() => startEditEvent(evt)}
+                                            className="p-1.5 text-slate-400 hover:text-pink-600 hover:bg-pink-50 rounded transition-all"
+                                            title={t.editEvent}
+                                          >
+                                            ✏️
+                                          </button>
+                                          <button
+                                            onClick={() => deleteEvent(currentDayData.day, evt.id)}
+                                            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-all"
+                                            title={t.deleteEvent}
+                                          >
+                                            🗑️
+                                          </button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ================= TAB: FLIGHTS ================= */}
+            {activeTab === 'flights' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                      <h2 className="text-xl font-extrabold text-slate-800">✈️ {t.tabs.flights} (共 4 段航線)</h2>
+                      <p className="text-xs text-slate-500 mt-1">{t.flightDetail}</p>
+                    </div>
+                    <div className="text-xs font-bold bg-pink-50 text-pink-700 border border-pink-200 px-3 py-1.5 rounded-lg">
+                      SFO ⇄ CTS via TPE (中華航空 China Airlines)
+                    </div>
+                  </div>
+
+                  {/* 飛機卡片網格 */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    {flights.map((f, idx) => (
+                      <div key={f.id} className="border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+                        
+                        <div className="bg-gradient-to-r from-emerald-500 to-emerald-400 text-white px-4 py-3 font-extrabold flex justify-between items-center text-sm">
+                          <span>{t.segment.replace('{num}', f.segment)}</span>
+                          <span className="bg-white/20 text-xs px-2 py-0.5 rounded uppercase font-black">{f.flightNo}</span>
+                        </div>
+
+                        <div className="p-4 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-lg font-black text-slate-800">{f.route}</span>
+                            <span className="text-xs text-slate-400 font-bold">{f.airline}</span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded-xl text-xs">
+                            <div>
+                              <p className="font-bold text-slate-400">DEPARTURE (出發)</p>
+                              <p className="font-extrabold text-slate-800 mt-1">{f.depTime}</p>
+                              <p className="text-[10px] text-slate-500 mt-0.5">{f.depAirport}</p>
+                            </div>
+                            <div>
+                              <p className="font-bold text-slate-400">ARRIVAL (抵達)</p>
+                              <p className="font-extrabold text-slate-800 mt-1">{f.arrTime}</p>
+                              <p className="text-[10px] text-slate-500 mt-0.5">{f.arrAirport}</p>
+                            </div>
+                          </div>
+
+                          {/* 劃位資訊 */}
+                          <div className="border-t border-dashed border-slate-200 pt-3">
+                            <p className="text-xs font-black text-slate-700 mb-2">🎟️ {t.seats}</p>
+                            <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                              <div className="bg-pink-50 p-2 rounded-lg border border-pink-100">
+                                <span className="block font-bold text-pink-700 text-[10px]">爸比 James</span>
+                                <span className="block font-extrabold text-slate-800 text-sm mt-0.5">{f.seats.James}</span>
+                              </div>
+                              <div className="bg-emerald-50 p-2 rounded-lg border border-emerald-100">
+                                <span className="block font-bold text-emerald-800 text-[10px]">媽咪 Vicky</span>
+                                <span className="block font-extrabold text-slate-800 text-sm mt-0.5">{f.seats.Vicky}</span>
+                              </div>
+                              <div className="bg-pink-50 p-2 rounded-lg border border-pink-100">
+                                <span className="block font-bold text-pink-700 text-[10px]">Chenn (QQ)</span>
+                                <span className="block font-extrabold text-slate-800 text-sm mt-0.5">{f.seats.Chenn}</span>
+                              </div>
+                              <div className="bg-emerald-50 p-2 rounded-lg border border-emerald-100">
+                                <span className="block font-bold text-emerald-800 text-[10px]">Honn (JJ)</span>
+                                <span className="block font-extrabold text-slate-800 text-sm mt-0.5">{f.seats.Honn}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ================= TAB: HOTELS ================= */}
+            {activeTab === 'hotels' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                  <h2 className="text-xl font-extrabold text-slate-800 border-b border-slate-100 pb-4">🏨 {t.tabs.hotels} (住宿資訊)</h2>
+                  
+                  <div className="grid grid-cols-1 gap-6 mt-6">
+                    {hotels.map((h) => (
+                      <div key={h.id} className="border border-slate-100 rounded-2xl p-6 hover:shadow-md shadow-sm transition-all bg-gradient-to-br from-white to-pink-50/10 flex flex-col md:flex-row md:items-start justify-between gap-6">
+                        <div className="space-y-3 flex-1">
+                          <h3 className="text-lg font-extrabold text-slate-800 text-pink-700">{h.name}</h3>
+                          
+                          <div className="flex flex-wrap gap-2 text-xs">
+                            <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-full font-bold">
+                              📆 {h.period}
+                            </span>
+                            <span className="bg-pink-50 text-pink-700 border border-pink-200 px-3 py-1 rounded-full font-bold">
+                              🛌 {h.roomType}
+                            </span>
+                          </div>
+
+                          <p className="text-sm text-slate-500 font-medium leading-relaxed">{h.notes}</p>
+                        </div>
+
+                        {/* 地址區塊與複製按鈕 */}
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 md:w-80 space-y-2 text-xs">
+                          <p className="font-bold text-slate-400">📍 {t.address}</p>
+                          <p className="font-extrabold text-slate-700">{h.address}</p>
+                          <button 
+                            onClick={() => handleCopyText(h.address)}
+                            className="mt-2 text-emerald-600 font-bold hover:underline block"
+                          >
+                            {lang === 'zh' ? '複製地址' : 'Copy Address'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ================= TAB: HSR ================= */}
+            {activeTab === 'hsr' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                  <h2 className="text-xl font-extrabold text-slate-800 border-b border-slate-100 pb-4">🚅 {t.hsrTicket}</h2>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {lang === 'zh' ? '台灣高鐵訂位，出站前請備好手機車票或實體車票。' : 'Taiwan THSR Booking tickets. Confirm seats before departure.'}
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    {hsr.map((ticket) => (
+                      <div key={ticket.id} className="relative bg-gradient-to-tr from-orange-50 to-amber-50 rounded-2xl border-2 border-orange-200 shadow-sm overflow-hidden flex flex-col justify-between">
+                        
+                        {/* 兩側車票打洞裝飾 */}
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-slate-50 rounded-r-full border-y border-r border-orange-200"></div>
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-slate-50 rounded-l-full border-y border-l border-orange-200"></div>
+
+                        <div className="bg-orange-500 text-white px-6 py-3 font-extrabold flex justify-between items-center text-xs">
+                          <span className="tracking-widest uppercase">TAIWAN HIGH SPEED RAIL</span>
+                          <span className="bg-white/20 px-2 py-0.5 rounded font-black">Train {ticket.trainNo}</span>
+                        </div>
+
+                        <div className="p-6 space-y-4">
+                          <div className="flex justify-between items-center border-b border-dashed border-orange-200 pb-3">
+                            <div>
+                              <p className="text-[10px] text-orange-600 font-bold uppercase">Departure Date</p>
+                              <p className="text-sm font-extrabold text-slate-800">{ticket.date}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-[10px] text-orange-600 font-bold uppercase">Service Class</p>
+                              <p className="text-sm font-extrabold text-slate-800">標準車廂 Standard</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-center">
+                            <div className="flex-1">
+                              <p className="text-[10px] text-slate-400 font-extrabold">ORIGIN (起點)</p>
+                              <p className="text-lg font-black text-slate-800">{ticket.route.split('➔')[0].trim()}</p>
+                              <p className="text-xs font-black text-orange-600 mt-1">{ticket.depTime}</p>
+                            </div>
+                            <div className="flex-1 flex flex-col items-center">
+                              <span className="text-xs text-orange-400">🚅</span>
+                              <span className="w-full border-t border-dashed border-orange-300 my-1"></span>
+                              <span className="text-[9px] text-slate-400 font-bold">Express Train</span>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-[10px] text-slate-400 font-extrabold">DESTINATION (終點)</p>
+                              <p className="text-lg font-black text-slate-800">{ticket.route.split('➔')[1].trim()}</p>
+                              <p className="text-xs font-black text-orange-600 mt-1">{ticket.arrTime}</p>
+                            </div>
+                          </div>
+
+                          <div className="bg-white/80 p-3 rounded-xl border border-orange-100 text-xs text-slate-700">
+                            <p className="font-extrabold text-slate-800 mb-1">🎫 {t.seats}:</p>
+                            <p className="font-bold">{ticket.seats}</p>
+                            <p className="text-[10px] text-slate-400 mt-1">{ticket.notes}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ================= TAB: PACKING LIST ================= */}
+            {activeTab === 'packing' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                  <div className="border-b border-slate-100 pb-4">
+                    <h2 className="text-xl font-extrabold text-slate-800">🎒 {t.tabs.packing} (個人行李準備清單)</h2>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {lang === 'zh' 
+                        ? '此列表為每人表列不歸類，勾選隨時同步。您可以自由增加與刪除行李單項。' 
+                        : 'Flat listed items per person with no grouping. Toggle/delete items easily.'}
+                    </p>
+                  </div>
+
+                  {/* 4 個人的清單卡片 */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+                    {Object.keys(packingList).map((person) => (
+                      <div key={person} className="bg-slate-50/50 p-4 rounded-2xl border border-slate-200/60 flex flex-col justify-between">
+                        <div>
+                          <div className="bg-gradient-to-r from-pink-400 to-emerald-400 text-white rounded-xl p-3 text-center font-black text-sm shadow-sm mb-4">
+                            🧑‍🚀 {person === 'Chenn' ? 'Chenn (QQ)' : person === 'Honn' ? 'Honn (JJ)' : person === 'James' ? '爸比 James' : '媽咪 Vicky'}
+                          </div>
+
+                          <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                            {packingList[person].map((item) => (
+                              <div 
+                                key={item.id} 
+                                className="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-slate-100 hover:border-pink-200 transition-all duration-150"
+                              >
+                                <label className="flex items-center gap-2.5 cursor-pointer flex-1">
+                                  <input 
+                                    type="checkbox" 
+                                    checked={item.checked}
+                                    onChange={() => togglePackItem(person, item.id)}
+                                    className="w-4 h-4 rounded text-emerald-500 focus:ring-emerald-400 focus:ring-opacity-20 border-slate-300 cursor-pointer"
+                                  />
+                                  <span className={`text-xs font-semibold ${item.checked ? 'line-through text-slate-300 font-medium' : 'text-slate-700'}`}>
+                                    {getTranslatedItem(item.text)}
+                                  </span>
+                                </label>
+
+                                <button
+                                  onClick={() => deletePackItem(person, item.id)}
+                                  className="text-slate-300 hover:text-red-500 text-xs px-1 hover:bg-red-50 rounded"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* 新增個人行李輸入框 */}
+                        <div className="mt-4 pt-3 border-t border-slate-200">
+                          <div className="flex gap-1.5">
+                            <input 
+                              type="text" 
+                              value={newPackItemText[person]}
+                              onChange={(e) => setNewPackItemText({ ...newPackItemText, [person]: e.target.value })}
+                              className="flex-1 px-2.5 py-1.5 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-pink-400 bg-white"
+                              placeholder={t.addPackItem}
+                            />
+                            <button
+                              onClick={() => addPackItem(person)}
+                              className="px-2.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black rounded-xl transition-all"
+                            >
+                              ＋
+                            </button>
+                          </div>
+                        </div>
+
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ================= TAB: TO-DO ================= */}
+            {activeTab === 'todo' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm max-w-3xl mx-auto">
+                  <h2 className="text-xl font-extrabold text-slate-800 border-b border-slate-100 pb-4">📝 {t.tabs.todo} (行前準備與待辦)</h2>
+                  
+                  {/* 新增待辦項目 */}
+                  <div className="flex gap-2 mt-6">
+                    <input 
+                      type="text"
+                      value={newTodoText}
+                      onChange={(e) => setNewTodoText(e.target.value)}
+                      className="flex-1 px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent bg-slate-50 text-sm"
+                      placeholder={t.addTodoItem}
+                    />
+                    <button
+                      onClick={addTodoItem}
+                      className="px-5 py-2.5 bg-pink-500 hover:bg-pink-600 text-white font-extrabold rounded-xl shadow shadow-pink-100 transition-all"
+                    >
+                      {lang === 'zh' ? '確認新增' : 'Add Item'}
+                    </button>
+                  </div>
+
+                  {/* 待辦項目列表 */}
+                  <div className="space-y-3 mt-6">
+                    {todos.map((todo) => (
+                      <div 
+                        key={todo.id} 
+                        className="flex items-center justify-between bg-slate-50 px-4 py-3 rounded-xl border border-slate-200/40 hover:border-pink-200 transition-all"
+                      >
+                        <label className="flex items-center gap-3 cursor-pointer flex-1">
+                          <input 
+                            type="checkbox"
+                            checked={todo.checked}
+                            onChange={() => toggleTodoItem(todo.id)}
+                            className="w-5 h-5 rounded text-pink-500 focus:ring-pink-400 focus:ring-opacity-20 border-slate-300 cursor-pointer"
+                          />
+                          <span className={`text-sm font-bold ${todo.checked ? 'line-through text-slate-300 font-medium' : 'text-slate-700'}`}>
+                            {todo.text}
+                          </span>
+                        </label>
+
+                        <button 
+                          onClick={() => deleteTodoItem(todo.id)}
+                          className="text-slate-400 hover:text-red-500 p-1.5 hover:bg-red-50 rounded"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </main>
+
+          {/* 頁尾資訊 */}
+          <footer className="max-w-7xl mx-auto text-center mt-12 text-slate-400 text-xs">
+            <p>© 2026 {t.siteTitle}. All Rights Reserved. Created lovingly for James, Vicky, Chenn, and Honn. 🌸☘️</p>
+          </footer>
+
+        </div>
+      );
+    }
+
+    // 將 App 元件掛載到 DOM 的 root 節點
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(<App />);
+  </script>
+</body>
+</html>
