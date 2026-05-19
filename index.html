@@ -156,8 +156,8 @@
         route: 'CTS ➔ TPE',
         airline: 'China Airlines 華航',
         flightNo: 'CI 131',
-        depTime: '2026-06-29 15:00',
-        arrTime: '2026-06-29 18:10',
+        depTime: '2026-06-29 15:05',
+        arrTime: '2026-06-29 18:15',
         depAirport: 'Sapporo New Chitose CTS (T-I)',
         arrAirport: 'Taipei Taoyuan TPE (T-2)',
         seats: {
@@ -173,8 +173,8 @@
         route: 'TPE ➔ SFO',
         airline: 'China Airlines 華航',
         flightNo: 'CI 004',
-        depTime: '2026-07-15 23:40',
-        arrTime: '2026-07-15 19:40',
+        depTime: '2026-07-15 23:30',
+        arrTime: '2026-07-15 20:30',
         depAirport: 'Taipei Taoyuan TPE (T-2)',
         arrAirport: 'San Francisco SFO (T-I)',
         seats: {
@@ -519,8 +519,8 @@
           { id: 'e12-1', time: '10:00', activity: '辦理退房與前往新千歲機場 Check-out & Travel to Airport', notes: '搭乘快速 Airport 號前往機場。' },
           { id: 'e12-2', time: '12:00', activity: '新千歲機場辦理登機手續 Flight Check-in', notes: '於華航櫃台托運行李。' },
           { id: 'e12-3', time: '13:00', activity: '新千歲機場美食街午餐 Lunch at New Chitose Airport', notes: '機場擁有著名的拉麵道場和Royce巧克力工廠，極度好逛！' },
-          { id: 'e12-4', time: '15:00', activity: '搭乘華航 CI 131 返回台灣 Flight CTS ➔ TPE', notes: '預計於 18:10 抵達台北桃園國際機場。' },
-          { id: 'e12-5', time: '18:10', activity: '抵達桃園機場並辦理入境 Arrive at TPE T2', notes: '通關並提領行李。' },
+          { id: 'e12-4', time: '15:05', activity: '搭乘華航 CI 131 返回台灣 Flight CTS ➔ TPE', notes: '預計於 18:15 抵達台北桃園國際機場。' },
+          { id: 'e12-5', time: '18:15', activity: '抵達桃園機場並辦理入境 Arrive at TPE T2', notes: '通關並提領行李。' },
           { id: 'e12-6', time: '19:30', activity: '搭乘桃捷/計程車前往桃園高鐵站 Transfer to HSR Taoyuan Station', notes: '準備南下台南。' },
           { id: 'e12-7', time: '20:10', activity: '搭乘高鐵 HSR 853 號 (桃園 ➔ 台南) 🚅', notes: '車票已預訂！座位在 Car 4, Seats 5A, 5B, 5C, 5D。預計 21:32 抵達台南。' },
           { id: 'e12-8', time: '22:00', activity: '抵達台南並入住：台南富信大飯店 Check-in at Fushin Hotel Tainan', notes: '搭乘計程車抵達飯店。好好休息！' }
@@ -714,7 +714,7 @@
           { id: 'e28-3', time: '15:00', activity: '台北東區或中山商圈散步 Last Shopping Spree', notes: '做最後的伴手禮（佳德鳳梨酥、糖村牛軋糖）與日用品補充。' },
           { id: 'e28-4', time: '18:00', activity: '返飯店取行李與晚餐 Packing and Airport departure', notes: '晚餐後，預約機場接送或搭乘桃捷前往桃園機場（約1小時）。' },
           { id: 'e28-5', time: '20:30', activity: '抵達桃園機場二航廈 Arrive at TPE T2', notes: '於華航櫃台辦理登機，托運行李。' },
-          { id: 'e28-6', time: '23:40', activity: '搭乘華航 CI 004 返回舊金山 Flight TPE ➔ SFO ✈️', notes: '回程約需 11 小時。預計於同日 19:40 抵達舊金山 (SFO)，為完美旅程劃下句點。' }
+          { id: 'e28-6', time: '23:30', activity: '搭乘華航 CI 004 返回舊金山 Flight TPE ➔ SFO ✈️', notes: '回程約需 11 小時。預計於同日 20:30 抵達舊金山 (SFO)，為完美旅程劃下句點。' }
         ]
       }
     ];
@@ -1823,7 +1823,7 @@
 
                   {/* 4 個人的清單卡片 */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-                    {Object.keys(packingList).map((person) => (
+                    {['James', 'Vicky', 'Chenn', 'Honn'].map((person) => (
                       <div key={person} className="bg-slate-50/50 p-4 rounded-2xl border border-slate-200/60 flex flex-col justify-between">
                         <div>
                           <div className="bg-gradient-to-r from-pink-400 to-emerald-400 text-white rounded-xl p-3 text-center font-black text-sm shadow-sm mb-4">
@@ -1831,7 +1831,7 @@
                           </div>
 
                           <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
-                            {packingList[person].map((item) => (
+                            {(packingList[person] || []).map((item) => (
                               <div 
                                 key={item.id} 
                                 className="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-slate-100 hover:border-pink-200 transition-all duration-150"
