@@ -1004,6 +1004,8 @@
 
       // 行李與待辦編輯狀態
       const [newPackItemText, setNewPackItemText] = useState({ James: '', Vicky: '', Chenn: '', Honn: '' });
+      const [editingPackItemId, setEditingPackItemId] = useState(null);
+      const [editPackItemText, setEditPackItemText] = useState('');
       const [newTodoText, setNewTodoText] = useState('');
 
       // 認證載入中
@@ -1149,6 +1151,26 @@
         const newPacking = { ...packingList, [person]: packingList[person].filter(item => item.id !== itemId) };
         setPackingList(newPacking);
         syncToFirestore({ packingList: newPacking });
+      };
+
+      const startEditPackItem = (item) => {
+        setEditingPackItemId(item.id);
+        setEditPackItemText(item.text);
+      };
+
+      const saveEditPackItem = (person, itemId) => {
+        if (!editPackItemText.trim()) return;
+        const newPacking = {
+          ...packingList,
+          [person]: packingList[person].map(item => item.id === itemId ? { ...item, text: editPackItemText.trim() } : item)
+        };
+        setPackingList(newPacking);
+        syncToFirestore({ packingList: newPacking });
+        setEditingPackItemId(null);
+      };
+
+      const cancelEditPackItem = () => {
+        setEditingPackItemId(null);
       };
 
       const toggleTodoItem = (todoId) => {
@@ -1836,24 +1858,49 @@
                                 key={item.id} 
                                 className="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-slate-100 hover:border-pink-200 transition-all duration-150"
                               >
-                                <label className="flex items-center gap-2.5 cursor-pointer flex-1">
-                                  <input 
-                                    type="checkbox" 
-                                    checked={item.checked}
-                                    onChange={() => togglePackItem(person, item.id)}
-                                    className="w-4 h-4 rounded text-emerald-500 focus:ring-emerald-400 focus:ring-opacity-20 border-slate-300 cursor-pointer"
-                                  />
-                                  <span className={`text-xs font-semibold ${item.checked ? 'line-through text-slate-300 font-medium' : 'text-slate-700'}`}>
-                                    {getTranslatedItem(item.text)}
-                                  </span>
-                                </label>
+                                {editingPackItemId === item.id ? (
+                                  <div className="flex items-center gap-2 flex-1 mr-2">
+                                    <input 
+                                      type="text" 
+                                      value={editPackItemText}
+                                      onChange={(e) => setEditPackItemText(e.target.value)}
+                                      className="flex-1 px-2 py-1 text-xs border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-pink-400 bg-white"
+                                    />
+                                    <button onClick={() => saveEditPackItem(person, item.id)} className="text-pink-600 font-bold text-xs hover:underline">儲存</button>
+                                    <button onClick={cancelEditPackItem} className="text-slate-400 text-xs hover:underline">取消</button>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <label className="flex items-center gap-2.5 cursor-pointer flex-1">
+                                      <input 
+                                        type="checkbox" 
+                                        checked={item.checked}
+                                        onChange={() => togglePackItem(person, item.id)}
+                                        className="w-4 h-4 rounded text-emerald-500 focus:ring-emerald-400 focus:ring-opacity-20 border-slate-300 cursor-pointer"
+                                      />
+                                      <span className={`text-xs font-semibold ${item.checked ? 'line-through text-slate-300 font-medium' : 'text-slate-700'}`}>
+                                        {getTranslatedItem(item.text)}
+                                      </span>
+                                    </label>
 
-                                <button
-                                  onClick={() => deletePackItem(person, item.id)}
-                                  className="text-slate-300 hover:text-red-500 text-xs px-1 hover:bg-red-50 rounded"
-                                >
-                                  ✕
-                                </button>
+                                    <div className="flex items-center gap-1">
+                                      <button
+                                        onClick={() => startEditPackItem(item)}
+                                        className="text-slate-300 hover:text-emerald-500 text-xs px-1 hover:bg-emerald-50 rounded"
+                                        title={lang === 'zh' ? '編輯' : 'Edit'}
+                                      >
+                                        ✏️
+                                      </button>
+                                      <button
+                                        onClick={() => deletePackItem(person, item.id)}
+                                        className="text-slate-300 hover:text-red-500 text-xs px-1 hover:bg-red-50 rounded"
+                                        title={lang === 'zh' ? '刪除' : 'Delete'}
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
+                                  </>
+                                )}
                               </div>
                             ))}
                           </div>
