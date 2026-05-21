@@ -1036,6 +1036,19 @@
         return matches ? matches.join(' ').trim() : text;
       };
 
+      // 將字串中的 URL 轉換為可點擊的超連結
+      const renderTextWithLinks = (text) => {
+        if (!text) return text;
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        const parts = text.split(urlRegex);
+        return parts.map((part, i) => {
+          if (part.match(urlRegex)) {
+            return <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:text-emerald-700 underline font-bold break-all">{part}</a>;
+          }
+          return part;
+        });
+      };
+
       // ==========================================
       // 行程表增刪改查邏輯
       // ==========================================
@@ -1580,7 +1593,7 @@
                                         rows="2"
                                       />
                                     ) : (
-                                      evt.notes
+                                      renderTextWithLinks(evt.notes)
                                     )}
                                   </td>
 
