@@ -111,6 +111,21 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
+    // NOTE: 取得日期的星期幾，支援中英文
+    const getWeekday = (dateStr, isEnglish) => {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return '';
+      const day = date.getDay();
+      if (isEnglish) {
+        const enDays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+        return enDays[day];
+      } else {
+        const zhDays = ['日', '一', '二', '三', '四', '五', '六'];
+        return zhDays[day];
+      }
+    };
+
     // ==========================================
     // 預設資料設定 (FLIGHTS, HOTELS, HSR, PACKING, TODOS, ITINERARY)
     // ==========================================
@@ -1439,7 +1454,9 @@
                         }`}
                       >
                         <span>Day {d.day}</span>
-                        <span className="text-[9px] opacity-80">{d.date.substring(5)}</span>
+                        <span className="text-[9px] opacity-80">
+                          {d.date.substring(5)}{lang === 'zh' ? ` (${getWeekday(d.date, false)})` : `(${getWeekday(d.date, true)})`}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -1452,7 +1469,9 @@
                       <div>
                         <h2 className="text-xl font-extrabold text-slate-800 flex items-center gap-2">
                           <span className="bg-pink-500 text-white px-3 py-1 rounded-lg text-sm">Day {currentDayData.day}</span>
-                          <span>{currentDayData.date}</span>
+                          <span>
+                            {currentDayData.date}{lang === 'zh' ? ` (${getWeekday(currentDayData.date, false)})` : `(${getWeekday(currentDayData.date, true)})`}
+                          </span>
                         </h2>
                         <p className="text-xs text-slate-500 mt-1">
                           {lang === 'zh' ? '本頁面直向排列，依照日期時間由上往下看當日規劃。' : 'Timeline displays top-to-bottom vertically in chronological order.'}
