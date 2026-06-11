@@ -24,38 +24,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js" crossorigin></script>
 
-  <!-- Firebase SDK (compat 版本，支援全域 firebase 物件) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
-  <script>
-    // Firebase 配置初始化
-    const firebaseConfig = {
-      apiKey: "AIzaSyDqcAh9eIl37hYSsHKv97pGhtcQS7RXwv4",
-      authDomain: "travel-f56a9.firebaseapp.com",
-      projectId: "travel-f56a9",
-      storageBucket: "travel-f56a9.firebasestorage.app",
-      messagingSenderId: "429667440747",
-      appId: "1:429667440747:web:4f1ff31e2b3ec242fff92e",
-      measurementId: "G-9F41WZW7GH"
-    };
-    firebase.initializeApp(firebaseConfig);
-
-    // 全域 Firebase 服務實例
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const googleProvider = new firebase.auth.GoogleAuthProvider();
-
-    // 授權白名單
-    const ALLOWED_EMAILS = [
-      "maxidea.tw@gmail.com",
-      "vickychang1220@gmail.com",
-      "chennlee2012@gmail.com",
-      "honnchilee@gmail.com"
-    ];
-  </script>
-
   <style>
     /* 隱藏橫向滾動條，保持介面乾淨 */
     .scrollbar-none::-webkit-scrollbar {
@@ -64,44 +32,6 @@
     .scrollbar-none {
       -ms-overflow-style: none;
       scrollbar-width: none;
-    }
-    /* 登入頁面背景動畫 */
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .login-bg {
-      background: linear-gradient(-45deg, #fce4ec, #e8f5e9, #e3f2fd, #fff3e0);
-      background-size: 400% 400%;
-      animation: gradientShift 12s ease infinite;
-    }
-    /* Loading 旋轉動畫 */
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .spinner {
-      width: 40px; height: 40px;
-      border: 4px solid #e2e8f0;
-      border-top-color: #ec4899;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    /* 登入按鈕 hover 效果 */
-    .google-btn {
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .google-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    }
-    /* 用戶頭像 */
-    .user-avatar {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      border: 2px solid #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
     }
   </style>
 </head>
@@ -142,10 +72,10 @@
         depAirport: 'San Francisco SFO (T-I)',
         arrAirport: 'Taipei Taoyuan TPE (T-2)',
         seats: {
-          James: '34H',
-          Vicky: '33H',
-          Chenn: '33K',
-          Honn: '34K'
+          James: '4B',
+          Vicky: '5B',
+          Chenn: '5A',
+          Honn: '4A'
         }
       },
       {
@@ -171,8 +101,8 @@
         route: 'CTS ➔ TPE',
         airline: 'China Airlines 華航',
         flightNo: 'CI 131',
-        depTime: '2026-06-29 15:05',
-        arrTime: '2026-06-29 18:15',
+        depTime: '2026-06-29 15:00',
+        arrTime: '2026-06-29 18:10',
         depAirport: 'Sapporo New Chitose CTS (T-I)',
         arrAirport: 'Taipei Taoyuan TPE (T-2)',
         seats: {
@@ -188,8 +118,8 @@
         route: 'TPE ➔ SFO',
         airline: 'China Airlines 華航',
         flightNo: 'CI 004',
-        depTime: '2026-07-15 23:30',
-        arrTime: '2026-07-15 20:30',
+        depTime: '2026-07-15 23:40',
+        arrTime: '2026-07-15 19:40',
         depAirport: 'Taipei Taoyuan TPE (T-2)',
         arrAirport: 'San Francisco SFO (T-I)',
         seats: {
@@ -386,17 +316,9 @@
     ];
 
     const defaultItinerary = [
-      // --- HOKKAIDO (Day 1 - 13) ---
+      // --- HOKKAIDO (Day 1 - 12) ---
       {
         day: 1,
-        date: '2026-06-17',
-        category: 'hokkaido',
-        events: [
-          { id: 'e0-1', time: '01:05', activity: '從舊金山機場出發 Depart from San Francisco Airport (SFO)', notes: '搭乘華航 CI 003，預計飛行約 12 小時抵達台北桃園機場。座位：James 4B, Vicky 5B, Chenn 5A, Honn 4A。' }
-        ]
-      },
-      {
-        day: 2,
         date: '2026-06-18',
         category: 'hokkaido',
         events: [
@@ -409,7 +331,7 @@
         ]
       },
       {
-        day: 3,
+        day: 2,
         date: '2026-06-19',
         category: 'hokkaido',
         events: [
@@ -420,7 +342,7 @@
         ]
       },
       {
-        day: 4,
+        day: 3,
         date: '2026-06-20',
         category: 'hokkaido',
         events: [
@@ -432,7 +354,7 @@
         ]
       },
       {
-        day: 5,
+        day: 4,
         date: '2026-06-21',
         category: 'hokkaido',
         events: [
@@ -444,7 +366,7 @@
         ]
       },
       {
-        day: 6,
+        day: 5,
         date: '2026-06-22',
         category: 'hokkaido',
         events: [
@@ -456,7 +378,7 @@
         ]
       },
       {
-        day: 7,
+        day: 6,
         date: '2026-06-23',
         category: 'hokkaido',
         events: [
@@ -469,7 +391,7 @@
         ]
       },
       {
-        day: 8,
+        day: 7,
         date: '2026-06-24',
         category: 'hokkaido',
         events: [
@@ -480,7 +402,7 @@
         ]
       },
       {
-        day: 9,
+        day: 8,
         date: '2026-06-25',
         category: 'hokkaido',
         events: [
@@ -492,7 +414,7 @@
         ]
       },
       {
-        day: 10,
+        day: 9,
         date: '2026-06-26',
         category: 'hokkaido',
         events: [
@@ -504,7 +426,7 @@
         ]
       },
       {
-        day: 11,
+        day: 10,
         date: '2026-06-27',
         category: 'hokkaido',
         events: [
@@ -516,7 +438,7 @@
         ]
       },
       {
-        day: 12,
+        day: 11,
         date: '2026-06-28',
         category: 'hokkaido',
         events: [
@@ -527,24 +449,24 @@
         ]
       },
       {
-        day: 13,
+        day: 12,
         date: '2026-06-29',
         category: 'hokkaido',
         events: [
           { id: 'e12-1', time: '10:00', activity: '辦理退房與前往新千歲機場 Check-out & Travel to Airport', notes: '搭乘快速 Airport 號前往機場。' },
           { id: 'e12-2', time: '12:00', activity: '新千歲機場辦理登機手續 Flight Check-in', notes: '於華航櫃台托運行李。' },
           { id: 'e12-3', time: '13:00', activity: '新千歲機場美食街午餐 Lunch at New Chitose Airport', notes: '機場擁有著名的拉麵道場和Royce巧克力工廠，極度好逛！' },
-          { id: 'e12-4', time: '15:05', activity: '搭乘華航 CI 131 返回台灣 Flight CTS ➔ TPE', notes: '預計於 18:15 抵達台北桃園國際機場。' },
-          { id: 'e12-5', time: '18:15', activity: '抵達桃園機場並辦理入境 Arrive at TPE T2', notes: '通關並提領行李。' },
+          { id: 'e12-4', time: '15:00', activity: '搭乘華航 CI 131 返回台灣 Flight CTS ➔ TPE', notes: '預計於 18:10 抵達台北桃園國際機場。' },
+          { id: 'e12-5', time: '18:10', activity: '抵達桃園機場並辦理入境 Arrive at TPE T2', notes: '通關並提領行李。' },
           { id: 'e12-6', time: '19:30', activity: '搭乘桃捷/計程車前往桃園高鐵站 Transfer to HSR Taoyuan Station', notes: '準備南下台南。' },
           { id: 'e12-7', time: '20:10', activity: '搭乘高鐵 HSR 853 號 (桃園 ➔ 台南) 🚅', notes: '車票已預訂！座位在 Car 4, Seats 5A, 5B, 5C, 5D。預計 21:32 抵達台南。' },
           { id: 'e12-8', time: '22:00', activity: '抵達台南並入住：台南富信大飯店 Check-in at Fushin Hotel Tainan', notes: '搭乘計程車抵達飯店。好好休息！' }
         ]
       },
 
-      // --- TAINAN (Day 14 - 20) ---
+      // --- TAINAN (Day 13 - 19) ---
       {
-        day: 14,
+        day: 13,
         date: '2026-06-30',
         category: 'tainan',
         events: [
@@ -556,7 +478,7 @@
         ]
       },
       {
-        day: 15,
+        day: 14,
         date: '2026-07-01',
         category: 'tainan',
         events: [
@@ -567,7 +489,7 @@
         ]
       },
       {
-        day: 16,
+        day: 15,
         date: '2026-07-02',
         category: 'tainan',
         events: [
@@ -579,7 +501,7 @@
         ]
       },
       {
-        day: 17,
+        day: 16,
         date: '2026-07-03',
         category: 'tainan',
         events: [
@@ -590,7 +512,7 @@
         ]
       },
       {
-        day: 18,
+        day: 17,
         date: '2026-07-04',
         category: 'tainan',
         events: [
@@ -601,7 +523,7 @@
         ]
       },
       {
-        day: 19,
+        day: 18,
         date: '2026-07-05',
         category: 'tainan',
         events: [
@@ -612,7 +534,7 @@
         ]
       },
       {
-        day: 20,
+        day: 19,
         date: '2026-07-06',
         category: 'tainan',
         events: [
@@ -626,9 +548,9 @@
         ]
       },
 
-      // --- TAIPEI (Day 21 - 29) ---
+      // --- TAIPEI (Day 20 - 28) ---
       {
-        day: 21,
+        day: 20,
         date: '2026-07-07',
         category: 'taipei',
         events: [
@@ -640,7 +562,7 @@
         ]
       },
       {
-        day: 22,
+        day: 21,
         date: '2026-07-08',
         category: 'taipei',
         events: [
@@ -652,7 +574,7 @@
         ]
       },
       {
-        day: 23,
+        day: 22,
         date: '2026-07-09',
         category: 'taipei',
         events: [
@@ -664,7 +586,7 @@
         ]
       },
       {
-        day: 24,
+        day: 23,
         date: '2026-07-10',
         category: 'taipei',
         events: [
@@ -675,7 +597,7 @@
         ]
       },
       {
-        day: 25,
+        day: 24,
         date: '2026-07-11',
         category: 'taipei',
         events: [
@@ -687,7 +609,7 @@
         ]
       },
       {
-        day: 26,
+        day: 25,
         date: '2026-07-12',
         category: 'taipei',
         events: [
@@ -698,7 +620,7 @@
         ]
       },
       {
-        day: 27,
+        day: 26,
         date: '2026-07-13',
         category: 'taipei',
         events: [
@@ -709,7 +631,7 @@
         ]
       },
       {
-        day: 28,
+        day: 27,
         date: '2026-07-14',
         category: 'taipei',
         events: [
@@ -720,7 +642,7 @@
         ]
       },
       {
-        day: 29,
+        day: 28,
         date: '2026-07-15',
         category: 'taipei',
         events: [
@@ -729,7 +651,7 @@
           { id: 'e28-3', time: '15:00', activity: '台北東區或中山商圈散步 Last Shopping Spree', notes: '做最後的伴手禮（佳德鳳梨酥、糖村牛軋糖）與日用品補充。' },
           { id: 'e28-4', time: '18:00', activity: '返飯店取行李與晚餐 Packing and Airport departure', notes: '晚餐後，預約機場接送或搭乘桃捷前往桃園機場（約1小時）。' },
           { id: 'e28-5', time: '20:30', activity: '抵達桃園機場二航廈 Arrive at TPE T2', notes: '於華航櫃台辦理登機，托運行李。' },
-          { id: 'e28-6', time: '23:30', activity: '搭乘華航 CI 004 返回舊金山 Flight TPE ➔ SFO ✈️', notes: '回程約需 11 小時。預計於同日 20:30 抵達舊金山 (SFO)，為完美旅程劃下句點。' }
+          { id: 'e28-6', time: '23:40', activity: '搭乘華航 CI 004 返回舊金山 Flight TPE ➔ SFO ✈️', notes: '回程約需 11 小時。預計於同日 19:40 抵達舊金山 (SFO)，為完美旅程劃下句點。' }
         ]
       }
     ];
@@ -744,6 +666,7 @@
           itinerary: '每日行程表',
           flights: '飛機航班',
           hotels: '酒店住宿',
+          hsr: '高鐵票預定',
           packing: '行李清單',
           todo: '待辦事項'
         },
@@ -775,10 +698,6 @@
         hsrTicket: '台灣高鐵 (THSR) 車票細節',
         noBudgetMsg: '⚠️ 為維護休閒心情，本系統不列出預算與支出明細 🍃',
         addPackItem: '新增行李項目',
-        printPackList: '列印清單',
-        printTitle: '的行李清單',
-        printProgress: '打包進度',
-        printDate: '列印日期',
         addTodoItem: '新增待辦事項',
         exportBtn: '📥 匯出行程備份 (JSON)',
         importBtn: '📤 匯入行程檔案',
@@ -793,6 +712,7 @@
           itinerary: 'Daily Itinerary',
           flights: 'Flights',
           hotels: 'Hotels',
+          hsr: 'HSR Booking',
           packing: 'Packing List',
           todo: 'To-Do List'
         },
@@ -824,10 +744,6 @@
         hsrTicket: 'Taiwan High Speed Rail (THSR) Ticket',
         noBudgetMsg: '⚠️ No budgets or expenses are listed to maintain a relaxing vacation mind! 🍃',
         addPackItem: 'Add Pack Item',
-        printPackList: 'Print List',
-        printTitle: "'s Packing List",
-        printProgress: 'Packing Progress',
-        printDate: 'Printed on',
         addTodoItem: 'Add To-Do',
         exportBtn: '📥 Export Trip Plan (JSON)',
         importBtn: '📤 Import Trip Plan',
@@ -840,186 +756,69 @@
     // APP 主要元件
     // ==========================================
 
-    // NOTE: Firestore 文件參考路徑
-    const TRAVEL_DOC_REF = db.collection('2026_travel').doc('travel');
-
-    /**
-     * 登入畫面元件
-     * @param {Object} props
-     * @param {Function} props.onLogin Google 登入觸發
-     * @param {string|null} props.error 錯誤訊息
-     * @param {boolean} props.signingIn 登入中狀態
-     */
-    function LoginScreen({ onLogin, error, signingIn }) {
-      return (
-        <div className="login-bg min-h-screen flex items-center justify-center p-4">
-          <div className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-8 sm:p-12 max-w-md w-full text-center border border-white/50">
-            <div className="bg-gradient-to-tr from-pink-400 to-emerald-400 p-4 rounded-full text-white shadow-lg mx-auto w-20 h-20 flex items-center justify-center mb-6">
-              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-              </svg>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-800 mb-2">2026 家庭旅遊</h1>
-            <p className="text-sm text-slate-500 mb-1">日本札幌 • 台灣台南 • 台灣台北</p>
-            <p className="text-xs text-slate-400 mb-8">Japan Sapporo & Taiwan Family Trip Planner</p>
-
-            {error && (
-              <div className="bg-red-50 text-red-700 text-sm font-bold p-3 rounded-xl border border-red-200 mb-6">
-                ⚠️ {error}
-              </div>
-            )}
-
-            <button
-              onClick={onLogin}
-              disabled={signingIn}
-              className="google-btn w-full flex items-center justify-center gap-3 bg-white border-2 border-slate-200 rounded-2xl px-6 py-4 font-bold text-slate-700 hover:border-pink-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {signingIn ? (
-                <div className="spinner" style={{width:20,height:20,borderWidth:3}}></div>
-              ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-              )}
-              {signingIn ? '登入中...' : '使用 Google 帳號登入'}
-            </button>
-
-            <p className="text-[10px] text-slate-400 mt-6">僅限授權家庭成員登入 • Authorized family members only</p>
-          </div>
-        </div>
-      );
-    }
-
-    /**
-     * Loading 畫面元件
-     */
-    function LoadingScreen() {
-      return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
-          <div className="spinner"></div>
-          <p className="text-sm text-slate-500 font-bold">載入行程資料中...</p>
-        </div>
-      );
-    }
-
     function App() {
-      // 認證狀態
-      const [user, setUser] = useState(null);
-      const [authLoading, setAuthLoading] = useState(true);
-      const [authError, setAuthError] = useState(null);
-      const [signingIn, setSigningIn] = useState(false);
-
-      // UI 狀態
       const [lang, setLang] = useState('zh');
       const [activeTab, setActiveTab] = useState('itinerary');
       const [selectedCategory, setSelectedCategory] = useState('hokkaido');
       const [selectedDay, setSelectedDay] = useState(1);
 
-      // 資料狀態（從 Firestore 載入）
-      const [dataLoading, setDataLoading] = useState(true);
-      const [itinerary, setItinerary] = useState(defaultItinerary);
-      const [packingList, setPackingList] = useState(defaultPackingList);
-      const [todos, setTodos] = useState(defaultTodos);
+      // 本地儲存 Persistence (備份讀取)
+      const [itinerary, setItinerary] = useState(() => {
+        const saved = localStorage.getItem('2026_itinerary_v2');
+        return saved ? JSON.parse(saved) : defaultItinerary;
+      });
 
-      // 固定資料（不存入 Firestore）
-      const [flights] = useState(defaultFlights);
-      const [hotels] = useState(defaultHotels);
-      const [hsr] = useState(defaultHsr);
+      const [packingList, setPackingList] = useState(() => {
+        const saved = localStorage.getItem('2026_packingList_v2');
+        return saved ? JSON.parse(saved) : defaultPackingList;
+      });
 
-      // NOTE: 監聽 Firebase Auth 狀態變化，持久化登入
+      const [todos, setTodos] = useState(() => {
+        const saved = localStorage.getItem('2026_todos_v2');
+        return saved ? JSON.parse(saved) : defaultTodos;
+      });
+
+      const [flights, setFlights] = useState(() => {
+        const saved = localStorage.getItem('2026_flights_v2');
+        return saved ? JSON.parse(saved) : defaultFlights;
+      });
+
+      const [hotels, setHotels] = useState(() => {
+        const saved = localStorage.getItem('2026_hotels_v2');
+        return saved ? JSON.parse(saved) : defaultHotels;
+      });
+
+      const [hsr, setHsr] = useState(() => {
+        const saved = localStorage.getItem('2026_hsr_v2');
+        return saved ? JSON.parse(saved) : defaultHsr;
+      });
+
+      // 自動儲存至 localStorage
       useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
-          if (firebaseUser) {
-            if (ALLOWED_EMAILS.includes(firebaseUser.email)) {
-              setUser(firebaseUser);
-              setAuthError(null);
-            } else {
-              // 不在白名單內，強制登出
-              auth.signOut();
-              setUser(null);
-              setAuthError('此帳號未獲授權。請使用家庭成員的 Google 帳號登入。');
-            }
-          } else {
-            setUser(null);
-          }
-          setAuthLoading(false);
-        });
-        return () => unsubscribe();
-      }, []);
+        localStorage.setItem('2026_itinerary_v2', JSON.stringify(itinerary));
+      }, [itinerary]);
 
-      // NOTE: 當用戶已登入時，使用 onSnapshot 監聽 Firestore 即時更新
       useEffect(() => {
-        if (!user) {
-          setDataLoading(false);
-          return;
-        }
-        setDataLoading(true);
-        const unsubscribe = TRAVEL_DOC_REF.onSnapshot((doc) => {
-          if (doc.exists) {
-            const data = doc.data();
-            if (data.itinerary) {
-              if (data.itinerary.length < 29) {
-                // 自動將舊的 28 天行程覆蓋為新的 29 天行程
-                setItinerary(defaultItinerary);
-                TRAVEL_DOC_REF.update({ itinerary: defaultItinerary });
-              } else {
-                setItinerary(data.itinerary);
-              }
-            }
-            if (data.packingList) setPackingList(data.packingList);
-            if (data.todos) setTodos(data.todos);
-          } else {
-            // 文件不存在時，用預設資料初始化 Firestore
-            TRAVEL_DOC_REF.set({
-              itinerary: defaultItinerary,
-              packingList: defaultPackingList,
-              todos: defaultTodos
-            });
-          }
-          setDataLoading(false);
-        }, (error) => {
-          console.error('Firestore onSnapshot error:', error);
-          setDataLoading(false);
-        });
-        return () => unsubscribe();
-      }, [user]);
+        localStorage.setItem('2026_packingList_v2', JSON.stringify(packingList));
+      }, [packingList]);
 
-      /**
-       * 將指定欄位同步寫回 Firestore
-       * @param {Object} updates 要更新的欄位物件
-       */
-      const syncToFirestore = (updates) => {
-        TRAVEL_DOC_REF.update(updates).catch((err) => {
-          console.error('Firestore update failed:', err);
-        });
-      };
+      useEffect(() => {
+        localStorage.setItem('2026_todos_v2', JSON.stringify(todos));
+      }, [todos]);
 
-      /**
-       * Google 登入處理
-       */
-      const handleGoogleLogin = async () => {
-        setSigningIn(true);
-        setAuthError(null);
-        try {
-          await auth.signInWithPopup(googleProvider);
-        } catch (err) {
-          console.error('Login error:', err);
-          setAuthError('登入失敗，請稍後再試。');
-        }
-        setSigningIn(false);
-      };
+      useEffect(() => {
+        localStorage.setItem('2026_flights_v2', JSON.stringify(flights));
+      }, [flights]);
 
-      /**
-       * 登出處理
-       */
-      const handleLogout = () => {
-        auth.signOut();
-      };
+      useEffect(() => {
+        localStorage.setItem('2026_hotels_v2', JSON.stringify(hotels));
+      }, [hotels]);
 
-      // 行程編輯狀態（必須在所有條件返回之前宣告，遵守 React Hooks 規則）
+      useEffect(() => {
+        localStorage.setItem('2026_hsr_v2', JSON.stringify(hsr));
+      }, [hsr]);
+
+      // 行程編輯狀態
       const [editingEventId, setEditingEventId] = useState(null);
       const [editForm, setEditForm] = useState({ time: '', activity: '', notes: '' });
       const [isAddingEvent, setIsAddingEvent] = useState(false);
@@ -1027,16 +826,7 @@
 
       // 行李與待辦編輯狀態
       const [newPackItemText, setNewPackItemText] = useState({ James: '', Vicky: '', Chenn: '', Honn: '' });
-      const [editingPackItemId, setEditingPackItemId] = useState(null);
-      const [editPackItemText, setEditPackItemText] = useState('');
       const [newTodoText, setNewTodoText] = useState('');
-
-      // 認證載入中
-      if (authLoading) return <LoadingScreen />;
-      // 未登入，顯示登入畫面
-      if (!user) return <LoginScreen onLogin={handleGoogleLogin} error={authError} signingIn={signingIn} />;
-      // 資料載入中
-      if (dataLoading) return <LoadingScreen />;
 
       // 切換區域時，自動將選取天數導向該區域第一天
       const handleCategoryChange = (cat) => {
@@ -1059,19 +849,6 @@
         return matches ? matches.join(' ').trim() : text;
       };
 
-      // 將字串中的 URL 轉換為可點擊的超連結
-      const renderTextWithLinks = (text) => {
-        if (!text) return text;
-        const urlRegex = /(https?:\/\/[^\s]+)/g;
-        const parts = text.split(urlRegex);
-        return parts.map((part, i) => {
-          if (part.match(urlRegex)) {
-            return <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:text-emerald-700 underline font-bold break-all">{part}</a>;
-          }
-          return part;
-        });
-      };
-
       // ==========================================
       // 行程表增刪改查邏輯
       // ==========================================
@@ -1086,27 +863,33 @@
       };
 
       const saveEditedEvent = (dayId, evtId) => {
-        const newItinerary = itinerary.map(d => {
-          if (d.day === dayId) {
-            return { ...d, events: d.events.map(e => e.id === evtId ? { ...e, ...editForm } : e) };
-          }
-          return d;
-        });
-        setItinerary(newItinerary);
-        syncToFirestore({ itinerary: newItinerary });
+        setItinerary(prev =>
+          prev.map(d => {
+            if (d.day === dayId) {
+              return {
+                ...d,
+                events: d.events.map(e => e.id === evtId ? { ...e, ...editForm } : e)
+              };
+            }
+            return d;
+          })
+        );
         setEditingEventId(null);
       };
 
       const deleteEvent = (dayId, evtId) => {
         if (window.confirm(lang === 'zh' ? '確定要刪除此行程項目嗎？' : 'Are you sure you want to delete this event?')) {
-          const newItinerary = itinerary.map(d => {
-            if (d.day === dayId) {
-              return { ...d, events: d.events.filter(e => e.id !== evtId) };
-            }
-            return d;
-          });
-          setItinerary(newItinerary);
-          syncToFirestore({ itinerary: newItinerary });
+          setItinerary(prev =>
+            prev.map(d => {
+              if (d.day === dayId) {
+                return {
+                  ...d,
+                  events: d.events.filter(e => e.id !== evtId)
+                };
+              }
+              return d;
+            })
+          );
         }
       };
 
@@ -1120,272 +903,70 @@
         const newId = `e-custom-${Date.now()}`;
         const addedEvent = { id: newId, ...newForm };
 
-        const newItinerary = itinerary.map(d => {
-          if (d.day === dayId) {
-            const updatedEvents = [...d.events, addedEvent].sort((a, b) => a.time.localeCompare(b.time));
-            return { ...d, events: updatedEvents };
-          }
-          return d;
-        });
-        setItinerary(newItinerary);
-        syncToFirestore({ itinerary: newItinerary });
-        setIsAddingEvent(false);
-      };
-
-      const moveEventToDay = (currentDayId, eventId, targetDayId) => {
-        const targetDayIdInt = parseInt(targetDayId, 10);
-        if (currentDayId === targetDayIdInt) return;
-
-        let eventToMove = null;
-        let newItinerary = itinerary.map(d => {
-          if (d.day === currentDayId) {
-            eventToMove = d.events.find(e => e.id === eventId);
-            return { ...d, events: d.events.filter(e => e.id !== eventId) };
-          }
-          return d;
-        });
-
-        if (eventToMove) {
-          newItinerary = newItinerary.map(d => {
-            if (d.day === targetDayIdInt) {
-              const updatedEvents = [...d.events, eventToMove].sort((a, b) => a.time.localeCompare(b.time));
+        setItinerary(prev =>
+          prev.map(d => {
+            if (d.day === dayId) {
+              const updatedEvents = [...d.events, addedEvent].sort((a, b) => {
+                return a.time.localeCompare(b.time);
+              });
               return { ...d, events: updatedEvents };
             }
             return d;
-          });
-        }
-        
-        setItinerary(newItinerary);
-        syncToFirestore({ itinerary: newItinerary });
-        setEditingEventId(null);
+          })
+        );
+        setIsAddingEvent(false);
       };
 
       // ==========================================
-      // 行李清單與待辦清單邏輯（同步至 Firestore）
+      // 行李清單與待辦清單邏輯
       // ==========================================
 
       const togglePackItem = (person, itemId) => {
-        const newPacking = {
-          ...packingList,
-          [person]: packingList[person].map(item => item.id === itemId ? { ...item, checked: !item.checked } : item)
-        };
-        setPackingList(newPacking);
-        syncToFirestore({ packingList: newPacking });
+        setPackingList(prev => ({
+          ...prev,
+          [person]: prev[person].map(item => item.id === itemId ? { ...item, checked: !item.checked } : item)
+        }));
       };
 
       const addPackItem = (person) => {
         const text = newPackItemText[person].trim();
         if (!text) return;
-        const newItem = { id: `pack-${person}-${Date.now()}`, text, checked: false };
-        const newPacking = { ...packingList, [person]: [...packingList[person], newItem] };
-        setPackingList(newPacking);
-        syncToFirestore({ packingList: newPacking });
+        const newItem = {
+          id: `pack-${person}-${Date.now()}`,
+          text: text,
+          checked: false
+        };
+        setPackingList(prev => ({
+          ...prev,
+          [person]: [...prev[person], newItem]
+        }));
         setNewPackItemText(prev => ({ ...prev, [person]: '' }));
       };
 
       const deletePackItem = (person, itemId) => {
-        const newPacking = { ...packingList, [person]: packingList[person].filter(item => item.id !== itemId) };
-        setPackingList(newPacking);
-        syncToFirestore({ packingList: newPacking });
-      };
-
-      const startEditPackItem = (item) => {
-        setEditingPackItemId(item.id);
-        setEditPackItemText(item.text);
-      };
-
-      const saveEditPackItem = (person, itemId) => {
-        if (!editPackItemText.trim()) return;
-        const newPacking = {
-          ...packingList,
-          [person]: packingList[person].map(item => item.id === itemId ? { ...item, text: editPackItemText.trim() } : item)
-        };
-        setPackingList(newPacking);
-        syncToFirestore({ packingList: newPacking });
-        setEditingPackItemId(null);
-      };
-
-      const cancelEditPackItem = () => {
-        setEditingPackItemId(null);
-      };
-
-      /**
-       * 列印指定成員的個人行李清單
-       * NOTE: 透過動態建立 iframe 實現單人清單列印，避免列印整頁
-       * @param {string} person 成員名稱（James/Vicky/Chenn/Honn）
-       */
-      const handlePrintPackingList = (person) => {
-        const items = packingList[person] || [];
-        const checkedCount = items.filter(i => i.checked).length;
-        const totalCount = items.length;
-
-        // NOTE: 根據成員名稱取得顯示用的中文暱稱
-        const displayNames = {
-          James: lang === 'zh' ? '爸比 James' : 'James',
-          Vicky: lang === 'zh' ? '媽咪 Vicky' : 'Vicky',
-          Chenn: 'Chenn (QQ)',
-          Honn: 'Honn (JJ)'
-        };
-        const displayName = displayNames[person] || person;
-        const now = new Date();
-        const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-
-        // NOTE: 建構列印用的 HTML 內容，包含內嵌樣式以確保列印效果一致
-        const itemsHtml = items.map(item => {
-          const checkbox = item.checked ? '☑' : '☐';
-          const textClass = item.checked ? 'checked' : '';
-          const itemText = getTranslatedItem(item.text);
-          return `<div class="item"><span class="checkbox">${checkbox}</span><span class="${textClass}">${itemText}</span></div>`;
-        }).join('');
-
-        const printHtml = `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="UTF-8">
-            <title>${displayName} ${t.printTitle}</title>
-            <style>
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              body {
-                font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-                padding: 32px;
-                color: #1e293b;
-                max-width: 600px;
-                margin: 0 auto;
-              }
-              .header {
-                text-align: center;
-                margin-bottom: 24px;
-                padding-bottom: 16px;
-                border-bottom: 2px solid #e2e8f0;
-              }
-              .header h1 {
-                font-size: 22px;
-                font-weight: 900;
-                margin-bottom: 4px;
-              }
-              .header .subtitle {
-                font-size: 12px;
-                color: #64748b;
-              }
-              .progress {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                margin-bottom: 20px;
-                padding: 10px 14px;
-                background: #f8fafc;
-                border: 1px solid #e2e8f0;
-                border-radius: 8px;
-                font-size: 13px;
-                font-weight: 700;
-              }
-              .progress-bar-bg {
-                flex: 1;
-                height: 8px;
-                background: #e2e8f0;
-                border-radius: 4px;
-                overflow: hidden;
-              }
-              .progress-bar-fill {
-                height: 100%;
-                background: #10b981;
-                border-radius: 4px;
-              }
-              .item {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                padding: 8px 0;
-                border-bottom: 1px solid #f1f5f9;
-                font-size: 14px;
-              }
-              .item:last-child { border-bottom: none; }
-              .checkbox {
-                font-size: 16px;
-                width: 22px;
-                text-align: center;
-                flex-shrink: 0;
-              }
-              .checked {
-                text-decoration: line-through;
-                color: #94a3b8;
-              }
-              .footer {
-                margin-top: 24px;
-                padding-top: 12px;
-                border-top: 1px solid #e2e8f0;
-                text-align: right;
-                font-size: 11px;
-                color: #94a3b8;
-              }
-              @media print {
-                body { padding: 16px; }
-              }
-            </style>
-          </head>
-          <body>
-            <div class="header">
-              <h1>🎒 ${displayName} ${t.printTitle}</h1>
-              <div class="subtitle">${t.siteTitle}</div>
-            </div>
-            <div class="progress">
-              <span>${t.printProgress}：${checkedCount} / ${totalCount}</span>
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fill" style="width:${totalCount > 0 ? Math.round(checkedCount/totalCount*100) : 0}%"></div>
-              </div>
-              <span>${totalCount > 0 ? Math.round(checkedCount/totalCount*100) : 0}%</span>
-            </div>
-            ${itemsHtml}
-            <div class="footer">${t.printDate}：${dateStr}</div>
-          </body>
-          </html>
-        `;
-
-        // NOTE: 動態建立隱藏 iframe，寫入內容後觸發列印，列印完畢移除 iframe
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.left = '-9999px';
-        iframe.style.top = '-9999px';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        document.body.appendChild(iframe);
-
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write(printHtml);
-        iframeDoc.close();
-
-        // HACK: 延遲觸發列印以確保 iframe 內容完全渲染
-        setTimeout(() => {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
-          // NOTE: 列印對話框關閉後移除 iframe
-          setTimeout(() => {
-            document.body.removeChild(iframe);
-          }, 1000);
-        }, 300);
+        setPackingList(prev => ({
+          ...prev,
+          [person]: prev[person].filter(item => item.id !== itemId)
+        }));
       };
 
       const toggleTodoItem = (todoId) => {
-        const newTodos = todos.map(t => t.id === todoId ? { ...t, checked: !t.checked } : t);
-        setTodos(newTodos);
-        syncToFirestore({ todos: newTodos });
+        setTodos(prev => prev.map(t => t.id === todoId ? { ...t, checked: !t.checked } : t));
       };
 
       const addTodoItem = () => {
         if (!newTodoText.trim()) return;
-        const newTodo = { id: `todo-${Date.now()}`, text: newTodoText.trim(), checked: false };
-        const newTodos = [...todos, newTodo];
-        setTodos(newTodos);
-        syncToFirestore({ todos: newTodos });
+        const newTodo = {
+          id: `todo-${Date.now()}`,
+          text: newTodoText.trim(),
+          checked: false
+        };
+        setTodos(prev => [...prev, newTodo]);
         setNewTodoText('');
       };
 
       const deleteTodoItem = (todoId) => {
-        const newTodos = todos.filter(t => t.id !== todoId);
-        setTodos(newTodos);
-        syncToFirestore({ todos: newTodos });
+        setTodos(prev => prev.filter(t => t.id !== todoId));
       };
 
       // ==========================================
@@ -1451,11 +1032,12 @@
         reader.onload = (event) => {
           try {
             const imported = JSON.parse(event.target.result);
-            const updates = {};
-            if (imported.itinerary) { setItinerary(imported.itinerary); updates.itinerary = imported.itinerary; }
-            if (imported.packingList) { setPackingList(imported.packingList); updates.packingList = imported.packingList; }
-            if (imported.todos) { setTodos(imported.todos); updates.todos = imported.todos; }
-            if (Object.keys(updates).length > 0) syncToFirestore(updates);
+            if (imported.itinerary) setItinerary(imported.itinerary);
+            if (imported.packingList) setPackingList(imported.packingList);
+            if (imported.todos) setTodos(imported.todos);
+            if (imported.flights) setFlights(imported.flights);
+            if (imported.hotels) setHotels(imported.hotels);
+            if (imported.hsr) setHsr(imported.hsr);
             alert(t.importSuccess);
           } catch (err) {
             alert('無效的 JSON 行程檔案！Invalid JSON format!');
@@ -1504,20 +1086,6 @@
                 >
                   🌐 {t.langBtn}
                 </button>
-
-                {/* 用戶資訊與登出 */}
-                <div className="flex items-center gap-2 ml-1 pl-2 border-l border-slate-200">
-                  {user.photoURL && (
-                    <img src={user.photoURL} alt="avatar" className="user-avatar" referrerPolicy="no-referrer" />
-                  )}
-                  <span className="text-xs font-bold text-slate-600 hidden sm:inline">{user.displayName || user.email}</span>
-                  <button
-                    onClick={handleLogout}
-                    className="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-all duration-200"
-                  >
-                    {lang === 'zh' ? '登出' : 'Logout'}
-                  </button>
-                </div>
               </div>
             </div>
           </header>
@@ -1555,7 +1123,16 @@
               >
                 🏨 {t.tabs.hotels}
               </button>
-              
+              <button 
+                onClick={() => setActiveTab('hsr')}
+                className={`flex-1 min-w-[120px] text-center py-3 text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 ${
+                  activeTab === 'hsr' 
+                    ? 'bg-pink-100 text-pink-700 shadow-sm' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                🚄 {t.tabs.hsr}
+              </button>
               <button 
                 onClick={() => setActiveTab('packing')}
                 className={`flex-1 min-w-[120px] text-center py-3 text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 ${
@@ -1582,6 +1159,12 @@
           {/* ================= MAIN CONTENT ================= */}
           <main className="max-w-7xl mx-auto px-4 mt-6">
             
+            {/* 溫馨提醒防線 */}
+            <div className="bg-emerald-50 text-emerald-800 border-l-4 border-emerald-400 p-4 rounded-xl shadow-sm mb-6 flex items-center justify-between text-xs sm:text-sm font-medium">
+              <span>{t.noBudgetMsg}</span>
+              <span className="opacity-65 text-lg">🌾</span>
+            </div>
+
             {/* ================= TAB: ITINERARY ================= */}
             {activeTab === 'itinerary' && (
               <div className="space-y-6">
@@ -1778,46 +1361,30 @@
                                         rows="2"
                                       />
                                     ) : (
-                                      renderTextWithLinks(evt.notes)
+                                      evt.notes
                                     )}
                                   </td>
 
                                   {/* 編輯控制項 */}
                                   <td className="py-4 px-6 text-center">
-                                    <div className="flex flex-col items-center justify-center gap-2">
+                                    <div className="flex items-center justify-center gap-1">
                                       {isEditing ? (
                                         <>
-                                          <div className="flex gap-1">
-                                            <button
-                                              onClick={() => saveEditedEvent(currentDayData.day, evt.id)}
-                                              className="px-2 py-1 text-xs font-bold text-white bg-pink-500 rounded hover:bg-pink-600 shadow"
-                                            >
-                                              {t.save}
-                                            </button>
-                                            <button
-                                              onClick={cancelEditEvent}
-                                              className="px-2 py-1 text-xs font-bold text-slate-500 bg-slate-100 rounded hover:bg-slate-200"
-                                            >
-                                              {t.cancel}
-                                            </button>
-                                          </div>
-                                          <select
-                                            onChange={(e) => {
-                                              if(e.target.value) {
-                                                moveEventToDay(currentDayData.day, evt.id, e.target.value);
-                                              }
-                                            }}
-                                            className="w-full px-1 py-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 rounded border border-emerald-200 focus:outline-none"
-                                            value=""
+                                          <button
+                                            onClick={() => saveEditedEvent(currentDayData.day, evt.id)}
+                                            className="px-2 py-1 text-xs font-bold text-white bg-pink-500 rounded hover:bg-pink-600 shadow"
                                           >
-                                            <option value="" disabled>移至 Day #</option>
-                                            {itinerary.map(d => (
-                                              <option key={d.day} value={d.day}>Day {d.day}</option>
-                                            ))}
-                                          </select>
+                                            {t.save}
+                                          </button>
+                                          <button
+                                            onClick={cancelEditEvent}
+                                            className="px-2 py-1 text-xs font-bold text-slate-500 bg-slate-100 rounded hover:bg-slate-200"
+                                          >
+                                            {t.cancel}
+                                          </button>
                                         </>
                                       ) : (
-                                        <div className="flex gap-1">
+                                        <>
                                           <button
                                             onClick={() => startEditEvent(evt)}
                                             className="p-1.5 text-slate-400 hover:text-pink-600 hover:bg-pink-50 rounded transition-all"
@@ -1832,7 +1399,7 @@
                                           >
                                             🗑️
                                           </button>
-                                        </div>
+                                        </>
                                       )}
                                     </div>
                                   </td>
@@ -2043,71 +1610,37 @@
 
                   {/* 4 個人的清單卡片 */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-                    {['James', 'Vicky', 'Chenn', 'Honn'].map((person) => (
+                    {Object.keys(packingList).map((person) => (
                       <div key={person} className="bg-slate-50/50 p-4 rounded-2xl border border-slate-200/60 flex flex-col justify-between">
                         <div>
-                          <div className="bg-gradient-to-r from-pink-400 to-emerald-400 text-white rounded-xl p-3 font-black text-sm shadow-sm mb-4">
-                            <div className="flex items-center justify-between">
-                              <span>🧑‍🚀 {person === 'Chenn' ? 'Chenn (QQ)' : person === 'Honn' ? 'Honn (JJ)' : person === 'James' ? '爸比 James' : '媽咪 Vicky'}</span>
-                              <button
-                                onClick={() => handlePrintPackingList(person)}
-                                className="bg-white/20 hover:bg-white/40 px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1"
-                                title={t.printPackList}
-                              >
-                                🖨️ {t.printPackList}
-                              </button>
-                            </div>
+                          <div className="bg-gradient-to-r from-pink-400 to-emerald-400 text-white rounded-xl p-3 text-center font-black text-sm shadow-sm mb-4">
+                            🧑‍🚀 {person === 'Chenn' ? 'Chenn (QQ)' : person === 'Honn' ? 'Honn (JJ)' : person === 'James' ? '爸比 James' : '媽咪 Vicky'}
                           </div>
 
                           <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
-                            {(packingList[person] || []).map((item) => (
+                            {packingList[person].map((item) => (
                               <div 
                                 key={item.id} 
                                 className="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-slate-100 hover:border-pink-200 transition-all duration-150"
                               >
-                                {editingPackItemId === item.id ? (
-                                  <div className="flex items-center gap-2 flex-1 mr-2">
-                                    <input 
-                                      type="text" 
-                                      value={editPackItemText}
-                                      onChange={(e) => setEditPackItemText(e.target.value)}
-                                      className="flex-1 px-2 py-1 text-xs border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-pink-400 bg-white"
-                                    />
-                                    <button onClick={() => saveEditPackItem(person, item.id)} className="text-pink-600 font-bold text-xs hover:underline">儲存</button>
-                                    <button onClick={cancelEditPackItem} className="text-slate-400 text-xs hover:underline">取消</button>
-                                  </div>
-                                ) : (
-                                  <>
-                                    <label className="flex items-center gap-2.5 cursor-pointer flex-1">
-                                      <input 
-                                        type="checkbox" 
-                                        checked={item.checked}
-                                        onChange={() => togglePackItem(person, item.id)}
-                                        className="w-4 h-4 rounded text-emerald-500 focus:ring-emerald-400 focus:ring-opacity-20 border-slate-300 cursor-pointer"
-                                      />
-                                      <span className={`text-xs font-semibold ${item.checked ? 'line-through text-slate-300 font-medium' : 'text-slate-700'}`}>
-                                        {getTranslatedItem(item.text)}
-                                      </span>
-                                    </label>
+                                <label className="flex items-center gap-2.5 cursor-pointer flex-1">
+                                  <input 
+                                    type="checkbox" 
+                                    checked={item.checked}
+                                    onChange={() => togglePackItem(person, item.id)}
+                                    className="w-4 h-4 rounded text-emerald-500 focus:ring-emerald-400 focus:ring-opacity-20 border-slate-300 cursor-pointer"
+                                  />
+                                  <span className={`text-xs font-semibold ${item.checked ? 'line-through text-slate-300 font-medium' : 'text-slate-700'}`}>
+                                    {getTranslatedItem(item.text)}
+                                  </span>
+                                </label>
 
-                                    <div className="flex items-center gap-1">
-                                      <button
-                                        onClick={() => startEditPackItem(item)}
-                                        className="text-slate-300 hover:text-emerald-500 text-xs px-1 hover:bg-emerald-50 rounded"
-                                        title={lang === 'zh' ? '編輯' : 'Edit'}
-                                      >
-                                        ✏️
-                                      </button>
-                                      <button
-                                        onClick={() => deletePackItem(person, item.id)}
-                                        className="text-slate-300 hover:text-red-500 text-xs px-1 hover:bg-red-50 rounded"
-                                        title={lang === 'zh' ? '刪除' : 'Delete'}
-                                      >
-                                        ✕
-                                      </button>
-                                    </div>
-                                  </>
-                                )}
+                                <button
+                                  onClick={() => deletePackItem(person, item.id)}
+                                  className="text-slate-300 hover:text-red-500 text-xs px-1 hover:bg-red-50 rounded"
+                                >
+                                  ✕
+                                </button>
                               </div>
                             ))}
                           </div>
