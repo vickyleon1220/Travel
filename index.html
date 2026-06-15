@@ -1030,6 +1030,8 @@
       const [editingPackItemId, setEditingPackItemId] = useState(null);
       const [editPackItemText, setEditPackItemText] = useState('');
       const [newTodoText, setNewTodoText] = useState('');
+      const [editingTodoId, setEditingTodoId] = useState(null);
+      const [editTodoText, setEditTodoText] = useState('');
 
       // 認證載入中
       if (authLoading) return <LoadingScreen />;
@@ -1215,7 +1217,7 @@
        * @param {string} person 成員名稱（James/Vicky/Chenn/Honn）
        */
       const handlePrintPackingList = (person) => {
-        const items = packingList[person] || [];
+        const items = [...(packingList[person] || [])].sort((a, b) => Number(a.checked) - Number(b.checked));
         const checkedCount = items.filter(i => i.checked).length;
         const totalCount = items.length;
 
@@ -1386,6 +1388,23 @@
         const newTodos = todos.filter(t => t.id !== todoId);
         setTodos(newTodos);
         syncToFirestore({ todos: newTodos });
+      };
+
+      const startEditTodoItem = (todo) => {
+        setEditingTodoId(todo.id);
+        setEditTodoText(todo.text);
+      };
+
+      const saveEditTodoItem = (todoId) => {
+        if (!editTodoText.trim()) return;
+        const newTodos = todos.map(t => t.id === todoId ? { ...t, text: editTodoText.trim() } : t);
+        setTodos(newTodos);
+        syncToFirestore({ todos: newTodos });
+        setEditingTodoId(null);
+      };
+
+      const cancelEditTodoItem = () => {
+        setEditingTodoId(null);
       };
 
       // ==========================================
@@ -2060,7 +2079,7 @@
                           </div>
 
                           <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
-                            {(packingList[person] || []).map((item) => (
+                            {([...(packingList[person] || [])].sort((a, b) => Number(a.checked) - Number(b.checked))).map((item) => (
                               <div 
                                 key={item.id} 
                                 className="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-slate-100 hover:border-pink-200 transition-all duration-150"
@@ -2164,29 +2183,54 @@
 
                   {/* 待辦項目列表 */}
                   <div className="space-y-3 mt-6">
-                    {todos.map((todo) => (
+                    {([...todos].sort((a, b) => Number(a.checked) - Number(b.checked))).map((todo) => (
                       <div 
                         key={todo.id} 
                         className="flex items-center justify-between bg-slate-50 px-4 py-3 rounded-xl border border-slate-200/40 hover:border-pink-200 transition-all"
                       >
-                        <label className="flex items-center gap-3 cursor-pointer flex-1">
-                          <input 
-                            type="checkbox"
-                            checked={todo.checked}
-                            onChange={() => toggleTodoItem(todo.id)}
-                            className="w-5 h-5 rounded text-pink-500 focus:ring-pink-400 focus:ring-opacity-20 border-slate-300 cursor-pointer"
-                          />
-                          <span className={`text-sm font-bold ${todo.checked ? 'line-through text-slate-300 font-medium' : 'text-slate-700'}`}>
-                            {todo.text}
-                          </span>
-                        </label>
+                        {editingTodoId === todo.id ? (
+                          <div className="flex items-center gap-2 flex-1 mr-2">
+                            <input 
+                              type="text" 
+                              value={editTodoText}
+                              onChange={(e) => setEditTodoText(e.target.value)}
+                              className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-pink-400 bg-white"
+                            />
+                            <button onClick={() => saveEditTodoItem(todo.id)} className="text-pink-600 font-bold text-sm hover:underline">儲存</button>
+                            <button onClick={cancelEditTodoItem} className="text-slate-400 text-sm hover:underline">取消</button>
+                          </div>
+                        ) : (
+                          <>
+                            <label className="flex items-center gap-3 cursor-pointer flex-1">
+                              <input 
+                                type="checkbox"
+                                checked={todo.checked}
+                                onChange={() => toggleTodoItem(todo.id)}
+                                className="w-5 h-5 rounded text-pink-500 focus:ring-pink-400 focus:ring-opacity-20 border-slate-300 cursor-pointer"
+                              />
+                              <span className={`text-sm font-bold ${todo.checked ? 'line-through text-slate-300 font-medium' : 'text-slate-700'}`}>
+                                {todo.text}
+                              </span>
+                            </label>
 
-                        <button 
-                          onClick={() => deleteTodoItem(todo.id)}
-                          className="text-slate-400 hover:text-red-500 p-1.5 hover:bg-red-50 rounded"
-                        >
-                          🗑️
-                        </button>
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => startEditTodoItem(todo)}
+                                className="text-slate-400 hover:text-emerald-500 p-1.5 hover:bg-emerald-50 rounded"
+                                title={lang === 'zh' ? '編輯' : 'Edit'}
+                              >
+                                ✏️
+                              </button>
+                              <button 
+                                onClick={() => deleteTodoItem(todo.id)}
+                                className="text-slate-400 hover:text-red-500 p-1.5 hover:bg-red-50 rounded"
+                                title={lang === 'zh' ? '刪除' : 'Delete'}
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </div>
                     ))}
                   </div>
